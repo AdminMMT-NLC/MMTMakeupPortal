@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>MMT Makeup Portal â€” Math Mavens Thailand</title>
+<title>MMT Makeup Portal — Math Mavens Thailand</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="description" content="Math Mavens Thailand internal portal â€” makeup requests, attendance logging, weekly headcounts, roster management." />
+<meta name="description" content="Math Mavens Thailand internal portal — makeup requests, attendance logging, weekly headcounts, roster management." />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230B2545'/><text x='16' y='22' font-family='Inter,system-ui,sans-serif' font-size='18' font-weight='800' fill='%23F4D35E' text-anchor='middle'>M</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
@@ -76,7 +76,7 @@
 <div id="root"></div>
 
 <!-- ============================================================
-     CONFIG â€” plain JS, runs before Babel. Edit these to go live.
+     CONFIG — plain JS, runs before Babel. Edit these to go live.
      ============================================================
      â€¢ Leave APPS_SCRIPT_URL blank to run as a self-contained demo
        (seed data + localStorage persistence).
@@ -95,35 +95,35 @@
 </script>
 
 <!-- ============================================================
-     DATA â€” roster + classes from MMT CLASS ALLOCATION 2025-2026.xlsx
+     DATA — roster + classes from MMT CLASS ALLOCATION 2025-2026.xlsx
      ============================================================ -->
 <script>
 window.CLASSES = [
-  { id:'1-BT1', name:'Year 1 Â· Tue 15:30', teacher:'BEA',    slot:'Tue 15:30', day:'Tue', time:'15:30' },
-  { id:'1-BT2', name:'Year 1 Â· Fri 15:30', teacher:'BREEZE', slot:'Fri 15:30', day:'Fri', time:'15:30' },
-  { id:'1-BT3', name:'Year 1 Â· Sun 10:00', teacher:'BEA',    slot:'Sun 10:00', day:'Sun', time:'10:00' },
-  { id:'1-BT4', name:'Year 1 Â· Sun 14:30', teacher:'BREEZE', slot:'Sun 14:30', day:'Sun', time:'14:30' },
-  { id:'1-BT5', name:'Year 1 Â· Fri 17:15', teacher:'BEA',    slot:'Fri 17:15', day:'Fri', time:'17:15' },
-  { id:'1-BT6', name:'Year 1 Â· Thu 15:30', teacher:'BREEZE', slot:'Thu 15:30', day:'Thu', time:'15:30' },
-  { id:'1-BT7', name:'Year 1 Â· Sat 12:30', teacher:'BREEZE', slot:'Sat 12:30', day:'Sat', time:'12:30' },
-  { id:'1-BT8', name:'Year 1 Â· Sat 10:00', teacher:'POND',   slot:'Sat 10:00', day:'Sat', time:'10:00' },
-  { id:'1-BT9', name:'Year 1 Â· Sat 14:30', teacher:'POND',   slot:'Sat 14:30', day:'Sat', time:'14:30' },
-  { id:'2-BT1', name:'Year 2 Â· Sat 12:30', teacher:'POND',   slot:'Sat 12:30', day:'Sat', time:'12:30' },
-  { id:'2-BT2', name:'Year 2 Â· Wed 17:15', teacher:'BEA',    slot:'Wed 17:15', day:'Wed', time:'17:15' },
-  { id:'2-BT3', name:'Year 2 Â· Fri 15:30', teacher:'BEA',    slot:'Fri 15:30', day:'Fri', time:'15:30' },
-  { id:'2-BT4', name:'Year 2 Â· Thu 15:30', teacher:'POND',   slot:'Thu 15:30', day:'Thu', time:'15:30' },
-  { id:'2-BT5', name:'Year 2 Â· Sun 12:30', teacher:'BREEZE', slot:'Sun 12:30', day:'Sun', time:'12:30' },
-  { id:'2-BT6', name:'Year 2 Â· Wed 15:30', teacher:'POND',   slot:'Wed 15:30', day:'Wed', time:'15:30' },
-  { id:'2-BT7', name:'Year 2 Â· Thu 13:00', teacher:'POND',   slot:'Thu 13:00', day:'Thu', time:'13:00' },
-  { id:'2-BT8', name:'Year 2 Â· Thu 17:15', teacher:'BEA',    slot:'Thu 17:15', day:'Thu', time:'17:15' },
-  { id:'2-BT9', name:'Year 2 Â· Sat 10:00', teacher:'BREEZE', slot:'Sat 10:00', day:'Sat', time:'10:00' },
-  { id:'3-BT3', name:'Year 3 Â· Sun 10:00', teacher:'POND',   slot:'Sun 10:00', day:'Sun', time:'10:00' },
-  { id:'3-BT4', name:'Year 3 Â· Sun 12:30', teacher:'BEA',    slot:'Sun 12:30', day:'Sun', time:'12:30' },
-  { id:'3-BT5', name:'Year 3 Â· Sun 14:30', teacher:'POND',   slot:'Sun 14:30', day:'Sun', time:'14:30' },
-  { id:'4-BT1', name:'Year 4 Â· Tue 17:15', teacher:'BEA',    slot:'Tue 17:15', day:'Tue', time:'17:15' },
-  { id:'4-BT3', name:'Year 4 Â· Fri 10:30', teacher:'BREEZE', slot:'Fri 10:30', day:'Fri', time:'10:30' },
-  { id:'4-BT5', name:'Year 4 Â· Thu 15:30', teacher:'BEA',    slot:'Thu 15:30', day:'Thu', time:'15:30' },
-  { id:'4-BT6', name:'Year 4 Â· Sat 08:30', teacher:'BREEZE', slot:'Sat 08:30', day:'Sat', time:'08:30' },
+  { id:'1-BT1', name:'Year 1 · Tue 15:30', teacher:'BEA',    slot:'Tue 15:30', day:'Tue', time:'15:30' },
+  { id:'1-BT2', name:'Year 1 · Fri 15:30', teacher:'BREEZE', slot:'Fri 15:30', day:'Fri', time:'15:30' },
+  { id:'1-BT3', name:'Year 1 · Sun 10:00', teacher:'BEA',    slot:'Sun 10:00', day:'Sun', time:'10:00' },
+  { id:'1-BT4', name:'Year 1 · Sun 14:30', teacher:'BREEZE', slot:'Sun 14:30', day:'Sun', time:'14:30' },
+  { id:'1-BT5', name:'Year 1 · Fri 17:15', teacher:'BEA',    slot:'Fri 17:15', day:'Fri', time:'17:15' },
+  { id:'1-BT6', name:'Year 1 · Thu 15:30', teacher:'BREEZE', slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'1-BT7', name:'Year 1 · Sat 12:30', teacher:'BREEZE', slot:'Sat 12:30', day:'Sat', time:'12:30' },
+  { id:'1-BT8', name:'Year 1 · Sat 10:00', teacher:'POND',   slot:'Sat 10:00', day:'Sat', time:'10:00' },
+  { id:'1-BT9', name:'Year 1 · Sat 14:30', teacher:'POND',   slot:'Sat 14:30', day:'Sat', time:'14:30' },
+  { id:'2-BT1', name:'Year 2 · Sat 12:30', teacher:'POND',   slot:'Sat 12:30', day:'Sat', time:'12:30' },
+  { id:'2-BT2', name:'Year 2 · Wed 17:15', teacher:'BEA',    slot:'Wed 17:15', day:'Wed', time:'17:15' },
+  { id:'2-BT3', name:'Year 2 · Fri 15:30', teacher:'BEA',    slot:'Fri 15:30', day:'Fri', time:'15:30' },
+  { id:'2-BT4', name:'Year 2 · Thu 15:30', teacher:'POND',   slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'2-BT5', name:'Year 2 · Sun 12:30', teacher:'BREEZE', slot:'Sun 12:30', day:'Sun', time:'12:30' },
+  { id:'2-BT6', name:'Year 2 · Wed 15:30', teacher:'POND',   slot:'Wed 15:30', day:'Wed', time:'15:30' },
+  { id:'2-BT7', name:'Year 2 · Thu 13:00', teacher:'POND',   slot:'Thu 13:00', day:'Thu', time:'13:00' },
+  { id:'2-BT8', name:'Year 2 · Thu 17:15', teacher:'BEA',    slot:'Thu 17:15', day:'Thu', time:'17:15' },
+  { id:'2-BT9', name:'Year 2 · Sat 10:00', teacher:'BREEZE', slot:'Sat 10:00', day:'Sat', time:'10:00' },
+  { id:'3-BT3', name:'Year 3 · Sun 10:00', teacher:'POND',   slot:'Sun 10:00', day:'Sun', time:'10:00' },
+  { id:'3-BT4', name:'Year 3 · Sun 12:30', teacher:'BEA',    slot:'Sun 12:30', day:'Sun', time:'12:30' },
+  { id:'3-BT5', name:'Year 3 · Sun 14:30', teacher:'POND',   slot:'Sun 14:30', day:'Sun', time:'14:30' },
+  { id:'4-BT1', name:'Year 4 · Tue 17:15', teacher:'BEA',    slot:'Tue 17:15', day:'Tue', time:'17:15' },
+  { id:'4-BT3', name:'Year 4 · Fri 10:30', teacher:'BREEZE', slot:'Fri 10:30', day:'Fri', time:'10:30' },
+  { id:'4-BT5', name:'Year 4 · Thu 15:30', teacher:'BEA',    slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'4-BT6', name:'Year 4 · Sat 08:30', teacher:'BREEZE', slot:'Sat 08:30', day:'Sat', time:'08:30' },
 ];
 
 window.STUDENTS_BY_CLASS = {
@@ -174,12 +174,12 @@ window.TEACHERS = ['BEA','BREEZE','POND'];
 
 window.REASONS = ['Sick','Family event','Doctor appointment','School trip','Travel','Religious holiday','Other'];
 
-// Embedded MMT logo (data URI) â€” keeps the file fully self-contained.
-window.MMT_LOGO = 'data:image/png;base64,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';
+// Embedded MMT logo (data URI) — keeps the file fully self-contained.
+window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAACnCAYAAAAonA/IAAAACXBIWXMAAAsSAAALEgHS3X78AAAUoklEQVR4nO2dXWwc13XH/7NL0rTIeEmFLhtbAamNi9pyURldJzXTqPrIMihaFE4N00CCApJRgOpD0KjRg/Tm8RtZ1ADTh6JSH8ygCNCSDWIjRoGUDE2ZcWXHJKTaTeyqEM21ZclKJFJLm18ixe3D3Mu5e3c+7ty5M3NHnh8wIHfnzr1nZs6c+3HOnDVqtRruFtqmKqMAjgI4B+DYypGehUQFoswUOgCMAngSlmzfxIHqrURlUkAuaQFU0TZVOQFLcQDgIKybpQsnYCkOYMk2kqAsyjDuBsvTNlXpALAAoMDtOrxypGc6doFYZgq9AC7CQTYcqE7HLo9C7hbLcwKNNwfQw/qYcJbNjFcM9aTe8rRNVXoBvO9R5G9XjvQk003MFA4BeNWjRKqtz91geUy//aRbSwLTZ/9oDDJERqqVp22qcgj2INmNApLoImYKx2ANjr3oIeVSSaq7rbapyjT8bxBlb2xTd2tqfhFAj0DpKoDeNE7dU2t52qYq34S44gDxdhEnIKY4gGUZT0QoS2Sk1vK0TVUWIH6DKNFP3d2n5l5UATyGA9WFKESKilRanrapyjEEVxwgnsU5E8EUB0hqXBaS1FkejwVBUZ5dOdIzqkwgFv+puR9702R90mh53BYERRmJcOpuhjx+VIEMsZEq5SELgmEHl9EMUMWm5n4cJNYrFaRKeSA3nnDiOaKIKjEV1ZMap2lqlKdtqvIY/BcEg6DuJs0UTMgN4J3Yn5aFw9QMmAMuCIoSfupuLQguQI1FpFRgTd21XjhMheUhbgjVigOosT4jUKs4gGXFtF84TIXyILpZyH6yZiTHTEF1V8pyglg1bdFeeUIsCIoSZuoe5eC2EHH9odFaechNNSNuRm7qPlMI6luT4Shxd2iJ1sqDYA7GUO1ITN3jsgraWh9tlYdYnbgGjcF8S2qn5n48qevCobbKg2hmMV4cJbM6b6xBbNwzITPm9oTQUnlIFxLVLMYLU6BM3EoNWG6LYzG36YuWyoPkHIQHPafu1uA1CaUGNLQ+2ilPhAuCongFzI/GKQhHDxlraYN2yoPknzDn1V1r0JqkUgOaLRxqpTyky0j6BgHOU/fR+MVoQKuIQ62UB/pcmPqbNFOIa71JhO/qsnCojVe9bapiAnguaTk4Dq80//5FqPeah+UHOFA9lrQQWiiPgrjkqDhHlOe7SQviQOKvKuvSbZnQT3FQXls8uLHw5eNJy+GCmbQAiSsPGZjq+GRj+LV/v7FxrrhR27gvaVGcOEics4mRuPJAU8ffdxbn8YWPbnbV1nOF9Xf+sJq0PC4keu0SVR6yIPikX7kk+N7kSzsKc/tCV/OdT/YkKY4bPWQmmAhJWx4z4fYd+eG7/1lt/XTDHoNtY9fazJdvJCiSF2ZSC4eJKY9EooJY+OLWGv74rQst/Pd3Pmzt2rr2e0mI5EdiiRKStDxajnVefOvl6/mt7Xud9q1N79PV+jyXxMJhIspDMpfqsmK7w3cW57Hv3fe73fZvL+e7Nv73q2txyhQAM+4GY1eemOKSpfirNyeu+5XZmOkxNJ26HyVvc8RGEpYnbKKCSPj7D2fXuq8tulodSu0OWtfe+pqu3VesQ4FYlYcsCOrmv8IXt9bw1PnXbouW3/xloUvTqXusiRLitjxmzO0JMfR/M/VTcwHWJp/Q1fqMxtVQbMojmLk0dsprizh8fi5wN3rn181dtxdKq1HIFJLYMqzGaXnMGNsS5vlf/ETagqyfe2hTpSwKGYlj4TAW5dEgLtmRwU/exd7LV7tkj6+t5wq33jmio98rloXDuCzPaEztBGJvxz8ubzch1LrNqw/ead1AkyqRVBJ5vHPkyhNDogIpnspPrG+2LN936YlV4VkWz0ePbl2f/63leyabir7rQwkQeaKESJWHLAhq54ZoN1axv+VfawDw8/0fFG63I3DXs53H6htfudINAO+hrfuK8XnVYqog0kQJUVseLRcEB5p+dMPA1o7/6tyfXg0s46W+1c2lXes7n6fzv62j9QEiHDJEpjyKMpcqpzd3BXubJusGyZX7l3HrwW3hWdftdlTn9tUr3HW0dP8q9wUd/V6RLRxGaXlMaGh1nm4+42ghfvaND4RnXb8o/6Z5rXmr4fvJXLeh6eA5kqFDJMoTQeZSJXw1f2H1vtwHjv6rpV3reO9rq75jn+UHtq+/9+DNXU77NmG0zuX36Dh1jyTDalSWR8tB8teb/9lzUW9u39XCdjPWvcq8dvgjT+fpeaOzUDXukRExapRHHCpXHl0XBP88/9Nqs7Hi2Y2uNW9htn/J9UW29x/fuPFxx4pvW/+Rf0jHFLjKM6xGYXm0szpdxk083PxKs0jZt/dev3d1d61h8LzdhLX/+oMPhcZFV9HSoenUXenCoVLlIQuC+1XWqYKnm/7tuoEtx3GKE6+XrzUoyduHlg2nQbIbP9Fz7KM0UYIy5dE1QvCR3CU80PSmb5AXS+X+ZXz06NbOrOx2O6qzv3u1NUgdq8gV3sj3bgQ5JiaUJUpQaXm0jEv+i5Z/kvKav/GVK93beawCcouIAPCm0bF9N0/dlShPzJlLhenPv77WatyU8pov7VrHpb7VzV8/tHWjcv+yVPtbMO7V1O+lJMOqqsciiSSPnrQbq/ij5heNMHX8fP8HhXv3hbtE76Gte7/xeeyp3QxVTwSYAA6FqSC05Ukwc6knA00/upEzNgONU5wIMkh2Q1O/V+gMqyq6LS2n5rz/Kkk09nuZYQ4OpTy6Jio42vIP2gWnT+a6cxoOnkNlWA1reaQbjopHcpdQyC1oY3UomzDu0dTvJb1wKK08GmUurePplhEdbxAAbf1e0vHOYSyPGeLYSPhW0499/VdJM5kvatelQjJRgpTykMylWi0IthureLj5lYbUKLqxgNYuTf1eZtADAiuPrguCf9k0ep0NLdWZV/IPfpK0DA4cDbpwKGN5TGi2INibuxLYf5UkK8h/7kJ+j2fcUEKYQQoHUh5dM5e6hZbqzIzRBQ2n7oEyrAa1PGbA8pHTn399zS20VGc2YbRONe1dTFoOB4QXfYWVR8dEBe3GKp5o/qH0S3tJ8yu07/6N0Z60GDzCGVaDWB5TTpboEAktFeRlAIcBPCtQ9gek7PMK2sVEvkfHqbtQvLPQb0+QzKU/ViGVKrqMm/ib1u+pqKoKoPdk3/QtAHjh/KFpuC9+8mUXoGDJ4s+2r+Hh7Y/DVqOa53GganoVELU82jk/v938oqondoQqA8HLZAcpK8yrue6qhoPnE34Lh77Ko2Pm0kdyl9CVf0eF/6oC7sE42Td9EVbX1FD2ZN+0yZV9CcC5sEKsIlfQ0O/lG+/sqTy6xiXLhpY6YHKWZOd7oCH5gZuVUWJ9NPV7eWZY9bM82iUqeCo/sS4bWspx7mTf9KjTjpN90wuot0jniJVxKutmqQKjqd/Ldcjiqjw6Zi5lU6MowPTZPwJrVnUYwDGBukJ3O5r6vVwTJbjOttqmKqPQbF3n2eZ/uaEoQvDlk33TSn+r6oXzh0woeNjacOfTv956W7fFnwoOVHv5Lx0tj46JCpxSo4QgCsfuCKwBeChWkG/X0O/lmGHVrdvSbmqu0H/1fTKmUQoZeJsq6poxunRM1dKwcNigPDomKvBKjRKQKiKcPZIB+H+HrWcTxj3TTb2fhpdIKQ2JEpwsz2gsogTALzVKANym5ipR0iX+Dz7XrqHfqy7euU55dMxcqjC0tHKybzry7vhk3/Q0LF9ZaCbzPbqlaqnLsLqjPDpmLg2SGkWAOKMflbR1FS0d87n7VVSlkp0Mq6zlOQbNFgSDpkbxwHWRLwrIgPz7Kur6ae4BHf1eI0C98iT6G908MqlRPDAV1RO0zdALh6vIFS7k9+iWqqUDqFee0WTkcEah/+p5Mg6JFTIwP6airjeNjm3N/F4XAW6FmQyYe5ORx+Z3cu93fKvl79abjNWwi2UvEd9TYrxw/lAvLKseKp3bn9Q+7n30zrUFBSKF5RYOVEcAwWCwjAwnkvxp7IyUkylPhjSZ8mRIkylPhjSZ8mRIkylPhjSZ8mRIkylPhjSZ8mRIwypPjWyLADodyp5iypzyqXeQKTvoUoatz2tj8WpfVDa34+I47wGBui6T/bMecohcKzDfjznsY+tzokyOo2UmyDE718jJ8nQCGOK+KyLYTRlw+V9n4jjvcQDz5H835SqS/88GaFdELreH2K38BOrPoQzr+syCKJBboMggrBOdJJ+H4PxUOlEkDbGNFmFfNMo4gDnm8wT5e5bsS4I4zvssqbcIoIT6a0CPX4L3NegXlIllCNZ58fI4QR+YOQDDjGyDsORfAgDUajW68cyS78sO+04xx/HbEClzmWw18p1beb59r7q9yogc71VnXOddZOrj9y+S7884HHeKOU723CYE63OTr8R+duq26JNQIhp4hvveD2oez8I2vUFMZlLEdd7zsC0b2y0MwrZyqi0vtTZliHXDtDy9DlTOumvhpDy82aZ98HGBRtkLwHY/nVCrQEPwHywGJc7zpvvZro7+ZZXLDafBctmj/FnUn1vJp/5h5v9BWAPnRViK5DlgBqwLtsR8Pg2xJ5BqKO0X3Z4yXYnrvO1xg7W/k6sjCp5h2hyD91juLKxxFWsB6YMwQY91U5552No3D7ETYp8idsrKPllFh+NkoCfHbiqI87zpjRlAvYKJdFn8uffDX8mXYFvRIvx7gklYCrebHEcfhhKV12uRcJgIxD+Nboj0pUHXYNygTza7qSKu86aKyS4RsFN5L/hzn4SYrOOwHw4vy1OCrVxLsB9WiudUndIvKBRrdofReDPpOsMArK5ApM4kieO858hWQvCBstv4Zg7+cg+jfj2JpxPW2KZE2hkndbLjpHnAX3lEbzLttwFLS/mnZx72oHIA0fXrqojrvMdh3xS/tR2WCZfv++FvhZdgdUf8CjaFVSq+SwUsBR0H1Pm2qIlzM7vzsPvkNEzbRQl73mdd/o+aOViW0G3f47C6bWp12GN2uq/s7YkMaTKveoY0mfJkSJMpT4Y0mfJkSJMpT4Y0mfJkSJMpT4Y0mfJkSKOr8jjF69CNXS6vwQoYh893gB187rYsH7Q+nlkH+fh6+CB7GuzOl2OD8ifgH3+TCLoqD42dZcMj6GfRyD4e6h6gDj+VlGHfYC/3Syfc/VIs9HwnSb16KlCAeNiktlrNigkW3ef0XYl8P8b8DVMfv43VrPjjCVK+5FI3hcZC01hnr/ZoLPVEzVuG2Dft0mxKwr8yw0OtAbVkNCRBJHbGjyKpj8bKzJL2nMJX52E5GocgbkEnSVnV1jI0unZbQaDvVtGNh4ZDzKM+hEKVd5+tZwCWcrDt8NBw0DMQD/0Qff0nXpI2fQIbb8aDdjPsKyYsTnWK1Mdvl2vO8K/psPUMcmVT2W3dDZbHj0FYVsdgttMI/jboELPR406Rek5z9dMgMDfY13O82hsj2xLc42+SI2ntFdj4JzGIpRggn/mX1+iLd7OC9fHQMrM1a6DcyR1zhpQb8Ki7kxxf82iPDsKdBuCJb1kwWIY0n4VuKyMiMuXJkCZTngxpMuXJkCZTngxpMuXJkIb1bT2GkD/rk/GZ4RaAi7zy9CYjS0bKWABwMVskzJAmG/NkSJMpT4Y0mfJkSBNGeQZgB3CPQccY23AsojH4XlVmMy9KpG0vOmOSxRNZ5aHZo4Zh5ayj0XOA2MmngU5YuWjYOJ1hzyPUtesXOVhCfehtItdcVnloKjSa/Oc4nIOVFmGd5CLZ2AAp9nv6f4ls1KJdRqNS0tdy+DcKTjH1sSlf+eNKXB0yIZ60rcuotwD0HPjPvAyXmXL0QeTPF7CuF7WA7PnS35Jw+l0Jvj5evjE0yiCFrPLQJIqXiTDsCbNPTicsAb8ES7noTR2CFdDdT/YVmeOKsKLsDNLGGa7eTtjRenTfKSIDra8E+6LSY8qwrGSZlN1N6nD6UQ8v2LaeIf/TG8RbjU5ug8N50bS2u0l9Je7442Qf21U9w9T1DFc/Xx8b2+0mgxwho8kGavbrLDRaj8bc0qi4MhclVyYRdWyUXadDWf57tl52X8mjviJzXLFmR/8N1uojCou1xnPjWSTf820N1OwIQbfz5WVnZarV6iMRB7iyTt8Hrc9JPr6OwFvY2dY4LO2mGq6CQdR3WzyybxLQ12xKqDfrXnWyY57dku164XcutDuvIayViABZ5aEzLdpdlREsF/I4LGWjYyf2LcpTsLstp3efhpi/NB3tWa6+M3D/hRea3n83rMSNolne2eNpW/R3Kmgw+xzsa+L3LhktPwe7O6f1AXaAPlVgp4B52h1TaH5qvj6/YHup2Zus8ozD/umfGuw3CABrAL3k8D/7+TSsk5yApYTsyZ2GnUm97FIHbZMq1zCRaYzUR9PFOslA8yHTwaPbi3/8cRTa1gQ5nk2MfZzITH0+S9zmVDfNLkrloZOQeSLrBOx33Okxk7Cu2SIarxF9L+wyGuVzuzdFiCl7HUn5tmhu4mHUJ43+kscxZVgX0ohcus8eNNl4oJ9hSGqFmWY+p1NrwLYUbrhZgozwjEPi9zsyr3qGNJlvK0OaNClPCXYCJX4VmV/ZdTs+6BK+1zFBfF8i8qWOtChPGZbijMMaMPejflor4g8SKRPkmCC+L5m2tSctynMG1rSV3hz64xpO/jS6bkT9PvxNc/KNufnTZGH9bPwU2M2nB9i+LKfjtCMNylMkm+jPCdG1GwPW7MzJccj7xtz8aTLwfjb2J4i8fHqDZD/95b5BaBB24UkY30ZMG++DYfPtUH8T9dnwvh3W/1X22CfqT/PyfdG6vPx2Xvtma/U5fQZrjVk8tNrSYHmo64Auww/DHvfwXZLbuMJvfcjPn+YGP+aZ85DBDzZUhPqyVP0maySkQXmWYCnMGOoHyINoVIo5WN0O6//ifVxOvjE/f1oQnPxsFC+fHs1++jjsBFT6JXRiSIPyANZFPA47lzK1DnRVlPftdJJynWj0cTn5xtz8aV6r2kuwB+Z0G0Oj347+7qeIT28OdrBWGfJpg2MhW2GOFxmfnrakxfLcLcj49LQlszwZ0vw/x/sUbiQNwb0AAAAASUVORK5CYII=';
 </script>
 
 <!-- ============================================================
-     APP CODE â€” JSX compiled at runtime by Babel standalone.
+     APP CODE — JSX compiled at runtime by Babel standalone.
      Single block keeps the file portable; all source in one place.
      ============================================================ -->
 <script type="text/babel" data-presets="react">
@@ -216,7 +216,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
     },
     save(state) {
       try { localStorage.setItem(MMT_CONFIG.STORAGE_KEY, JSON.stringify(state)); }
-      catch { /* quota or private mode â€” ignore */ }
+      catch { /* quota or private mode — ignore */ }
     },
     clear() { try { localStorage.removeItem(MMT_CONFIG.STORAGE_KEY); } catch {} },
   };
@@ -301,7 +301,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   // ============================================================
   function deriveStatus(r) {
     if (r.calendarEventCreated) return 'Approved & scheduled';
-    if (r.adminApproved)        return 'Approved â€” not yet on calendar';
+    if (r.adminApproved)        return 'Approved — not yet on calendar';
     if (r.teacherConfirmed)     return 'Pending admin manager approval';
     return 'Pending teacher approval';
   }
@@ -418,7 +418,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   const STATUS_STYLES = {
     'Pending teacher approval':       'bg-sun-100 text-navy-700 border border-sun-300',
     'Pending admin manager approval': 'bg-sky-100 text-sky-600 border border-sky-200',
-    'Approved â€” not yet on calendar': 'bg-leaf-100 text-leaf-600 border border-leaf-200',
+    'Approved — not yet on calendar': 'bg-leaf-100 text-leaf-600 border border-leaf-200',
     'Approved & scheduled':           'bg-navy text-white',
     'Declined':                       'bg-red-100 text-red-700 border border-red-200',
   };
@@ -600,14 +600,14 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Pending Teacher"            value={pendingTeacher.length}       tone="sun"  onClick={() => onNavigate('makeup', 'pending-teacher')} />
           <StatCard label="Pending Admin"              value={pendingAdmin.length}         tone="sky"  onClick={() => onNavigate('makeup', 'pending-admin')} />
-          <StatCard label="Approved Â· Not on Calendar" value={approvedNotScheduled.length} tone="leaf" onClick={() => onNavigate('makeup', 'approved-not-scheduled')} />
+          <StatCard label="Approved · Not on Calendar" value={approvedNotScheduled.length} tone="leaf" onClick={() => onNavigate('makeup', 'approved-not-scheduled')} />
           <StatCard label="Scheduled"                  value={scheduled.length}            tone="navy" onClick={() => onNavigate('makeup', 'scheduled')} />
         </div>
 
         <div>
           <div className="flex items-end justify-between mb-3 flex-wrap gap-2">
             <div>
-              <h2 className="font-semibold text-navy text-lg">Absence summary Â· last 30 days</h2>
+              <h2 className="font-semibold text-navy text-lg">Absence summary · last 30 days</h2>
               <p className="text-xs text-navy-400">Hover a slice or legend row to focus a reason.</p>
             </div>
             <div className="text-xs text-navy-400 flex items-center gap-1.5">
@@ -632,7 +632,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
               <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-wider font-semibold text-red-500">Without scheduled makeup</div>
-                  <div className="text-sm text-navy-400">Absences with no makeup logged â€” action needed.</div>
+                  <div className="text-sm text-navy-400">Absences with no makeup logged — action needed.</div>
                 </div>
                 <span className="chip bg-red-100 text-red-700 border border-red-200">
                   {withoutMakeup.reduce((a, b) => a + b.count, 0)} absences
@@ -658,11 +658,11 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
                 <div className="min-w-0">
                   <div className="font-medium text-navy flex items-baseline gap-2 flex-wrap">
                     <span>{r.studentNickname}</span>
-                    <span className="text-navy-300 font-normal">Â· {r.classId}</span>
+                    <span className="text-navy-300 font-normal">· {r.classId}</span>
                     <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px] !uppercase tracking-wider">Lesson {r.lesson}</span>
                   </div>
                   <div className="text-xs text-navy-400 mt-0.5">
-                    Missed {r.missedDate} â†’ Proposed {r.proposedDate} {r.proposedTime} Â· {r.teacher}
+                    Missed {r.missedDate} â†’ Proposed {r.proposedDate} {r.proposedTime} · {r.teacher}
                   </div>
                 </div>
                 <StatusBadge status={r.status} />
@@ -678,7 +678,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   };
 
   // ============================================================
-  // MAKEUP â€” modal + card + list
+  // MAKEUP — modal + card + list
   // ============================================================
   const NewMakeupModal = ({ onSubmit, onClose }) => {
     const [classId, setClassId] = React.useState('');
@@ -720,7 +720,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-leaf">Makeup Requests</div>
               <h2 className="text-xl font-bold text-navy mt-0.5">New makeup request</h2>
               <p className="text-xs text-navy-400 mt-1 max-w-md">
-                Parents request via WhatsApp â€” staff log it here. Teacher confirms, then the admin manager approves.
+                Parents request via WhatsApp — staff log it here. Teacher confirms, then the admin manager approves.
               </p>
             </div>
             <button onClick={onClose} className="text-navy-400 hover:text-navy w-8 h-8 rounded-md hover:bg-navy-50 flex items-center justify-center" aria-label="Close">
@@ -735,7 +735,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
                 <select className="input" value={classId} onChange={(e)=>setClassId(e.target.value)}>
                   <option value="">Select classâ€¦</option>
                   {CLASSES.map((c) => (
-                    <option key={c.id} value={c.id}>{c.id} Â· {c.slot} Â· {c.teacher}</option>
+                    <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
                   ))}
                 </select>
               </div>
@@ -817,13 +817,13 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
           <div>
             <div className="flex items-baseline gap-2 flex-wrap">
               <h3 className="text-lg font-semibold text-navy">{r.studentNickname}</h3>
-              <span className="text-sm text-navy-400">Â· {r.classId}</span>
+              <span className="text-sm text-navy-400">· {r.classId}</span>
               <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px] !uppercase tracking-wider">Lesson {r.lesson}</span>
-              <span className="text-xs text-navy-300">Â· {r.teacher}</span>
+              <span className="text-xs text-navy-300">· {r.teacher}</span>
             </div>
             <p className="text-sm text-navy-500 mt-0.5">
               Missed <strong>{r.missedDate}</strong> â†’ Proposed <strong>{r.proposedDate} {r.proposedTime}</strong>{' '}
-              <span className="text-navy-300">Â· 1.5h</span>
+              <span className="text-navy-300">· 1.5h</span>
             </p>
           </div>
           <StatusBadge status={status} />
@@ -857,7 +857,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
           )}
           {r.calendarEventCreated && (
             <span className="text-xs text-leaf-600 font-medium flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-leaf" /> On calendar Â· all done
+              <span className="w-2 h-2 rounded-full bg-leaf" /> On calendar · all done
             </span>
           )}
           <div className="ml-auto text-xs text-navy-300 font-mono">{r.id}</div>
@@ -870,7 +870,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
     { id: 'all', label: 'All' },
     { id: 'pending-teacher', label: 'Pending teacher' },
     { id: 'pending-admin', label: 'Pending admin' },
-    { id: 'approved-not-scheduled', label: 'Approved Â· need calendar' },
+    { id: 'approved-not-scheduled', label: 'Approved · need calendar' },
     { id: 'scheduled', label: 'Scheduled' },
   ];
 
@@ -946,7 +946,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   };
 
   // ============================================================
-  // ATTENDANCE â€” weekly tracker + log roster + recent log
+  // ATTENDANCE — weekly tracker + log roster + recent log
   // ============================================================
   const STATUS_BTNS = ['Present', 'Absent (no notice)', 'Absent (pre-notified)'];
 
@@ -968,7 +968,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
         <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
           <div>
             <h2 className="font-semibold text-navy">Weekly attendance tracker</h2>
-            <p className="text-xs text-navy-400">Week of <strong>Sat 9 May â†’ Fri 15 May 2026</strong> Â· stacked bars show Present / Pre-notified / No notice.</p>
+            <p className="text-xs text-navy-400">Week of <strong>Sat 9 May â†’ Fri 15 May 2026</strong> · stacked bars show Present / Pre-notified / No notice.</p>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-navy-500 flex-wrap">
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-leaf" /> Present</span>
@@ -1089,7 +1089,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
               <select className="input" value={classId} onChange={(e)=>{ setClassId(e.target.value); setStatuses({}); }}>
                 <option value="">Select classâ€¦</option>
                 {CLASSES.map((c) => (
-                  <option key={c.id} value={c.id}>{c.id} Â· {c.slot} Â· {c.teacher}</option>
+                  <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
                 ))}
               </select>
             </div>
@@ -1100,7 +1100,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
           <div className="card overflow-hidden">
             <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
               <div className="font-semibold text-navy">
-                Roster Â· {classId} <span className="text-navy-400 font-normal">Â· {roster.length} student{roster.length === 1 ? '' : 's'}</span>
+                Roster · {classId} <span className="text-navy-400 font-normal">· {roster.length} student{roster.length === 1 ? '' : 's'}</span>
               </div>
               <div className="text-xs text-navy-400">Default = Absent (no notice). Toggle as you go.</div>
             </div>
@@ -1187,7 +1187,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   };
 
   // ============================================================
-  // HEADCOUNTS â€” per-teacher summary + tables
+  // HEADCOUNTS — per-teacher summary + tables
   // ============================================================
   const TEACHER_TONES = {
     BEA:    { bg: 'bg-leaf',   bg50: 'bg-leaf-50',   text: 'text-leaf-600',   border: 'border-leaf-200',   chip: 'bg-leaf-100 text-leaf-600 border border-leaf-200' },
@@ -1370,9 +1370,9 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
     return (
       <div className="space-y-6">
         <SectionHeader
-          eyebrow="Reporting Â· Bonus"
+          eyebrow="Reporting · Bonus"
           title="Weekly Headcounts by Teacher"
-          description="Each teacher's weekly bonus is based on the total students they taught â€” actual + makeups + trials. Click a card to focus on one teacher."
+          description="Each teacher's weekly bonus is based on the total students they taught — actual + makeups + trials. Click a card to focus on one teacher."
           action={
             <select className="input max-w-xs">
               <option>{HEADCOUNT_WEEK.start} â†’ {HEADCOUNT_WEEK.end}</option>
@@ -1385,7 +1385,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="text-xs text-navy-400">
             Showing week <strong className="text-navy">{HEADCOUNT_WEEK.start} â†’ {HEADCOUNT_WEEK.end}</strong>
-            {focusTeacher && <> Â· focused on <strong className="text-navy">{focusTeacher}</strong> <button onClick={() => setFocusTeacher(null)} className="text-sky hover:underline ml-1">clear</button></>}
+            {focusTeacher && <> · focused on <strong className="text-navy">{focusTeacher}</strong> <button onClick={() => setFocusTeacher(null)} className="text-sky hover:underline ml-1">clear</button></>}
           </div>
           <ExportRange label="headcounts by teacher" defaultFrom="2026-04-01" defaultTo="2026-05-15" onExport={handleExport} />
         </div>
@@ -1410,8 +1410,8 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
           <div className="card p-5 bg-navy text-white">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <div className="text-xs uppercase tracking-wider text-white/70 font-semibold">All teachers Â· week total</div>
-                <div className="text-sm text-white/60">{teachers.length} teachers Â· {headcountRows.length} classes</div>
+                <div className="text-xs uppercase tracking-wider text-white/70 font-semibold">All teachers · week total</div>
+                <div className="text-sm text-white/60">{teachers.length} teachers · {headcountRows.length} classes</div>
               </div>
               <div className="flex items-center gap-6 flex-wrap">
                 <Stat label="Expected" value={grand.expected} />
@@ -1428,7 +1428,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   };
 
   // ============================================================
-  // ROSTER â€” admin: add/remove/move students, add/remove classes
+  // ROSTER — admin: add/remove/move students, add/remove classes
   // ============================================================
   const AddStudentForm = ({ onAdd, onToast }) => {
     const [nick, setNick]       = React.useState('');
@@ -1467,7 +1467,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
             <select className="input" value={classId} onChange={(e)=>setClassId(e.target.value)}>
               <option value="">Select classâ€¦</option>
               {CLASSES.map((c) => (
-                <option key={c.id} value={c.id}>{c.id} Â· {c.slot} Â· {c.teacher}</option>
+                <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
               ))}
             </select>
           </div>
@@ -1498,7 +1498,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
       }
       onAdd({
         id: id.trim(),
-        name: `${year} Â· ${day} ${time}`,
+        name: `${year} · ${day} ${time}`,
         teacher, slot: `${day} ${time}`,
         day, time,
       });
@@ -1559,7 +1559,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
         <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-navy">All classes & students</h2>
-            <p className="text-xs text-navy-400">{CLASSES.length} classes Â· {Object.values(STUDENTS_BY_CLASS).reduce((a, b) => a + b.length, 0)} students</p>
+            <p className="text-xs text-navy-400">{CLASSES.length} classes · {Object.values(STUDENTS_BY_CLASS).reduce((a, b) => a + b.length, 0)} students</p>
           </div>
         </div>
         <ul className="divide-y divide-navy-50">
@@ -1576,7 +1576,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
                     </span>
                     <div>
                       <div className="font-mono font-semibold text-navy">{c.id}</div>
-                      <div className="text-xs text-navy-400">{c.slot} Â· {c.teacher}</div>
+                      <div className="text-xs text-navy-400">{c.slot} · {c.teacher}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1591,7 +1591,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
                 {isOpen && (
                   <div className="px-5 pb-4 pt-1 bg-navy-50/30">
                     {roster.length === 0 ? (
-                      <div className="text-sm text-navy-400 py-2">No students yet â€” add one above.</div>
+                      <div className="text-sm text-navy-400 py-2">No students yet — add one above.</div>
                     ) : (
                       <ul className="grid gap-1.5">
                         {roster.map(nick => (
@@ -1653,7 +1653,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
   );
 
   // ============================================================
-  // APP SHELL â€” state + routing + modal + persistence
+  // APP SHELL — state + routing + modal + persistence
   // ============================================================
   const App = () => {
     // Hydrate from localStorage if present, else use seed data.
@@ -1736,7 +1736,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
     function updateRequest(id, patch) {
       setRequests(rs => rs.map(r => r.id === id ? { ...r, ...patch } : r));
       if (patch.teacherConfirmed)          showToast('Teacher confirmed.');
-      else if (patch.adminApproved)        showToast('Admin manager approved â€” add to Google Calendar next.');
+      else if (patch.adminApproved)        showToast('Admin manager approved — add to Google Calendar next.');
       else if (patch.calendarEventCreated) showToast('Marked as scheduled. All done!');
       callBackend('updateMakeup', { id, updates: patch });
     }
@@ -1752,7 +1752,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
       };
       setRequests(rs => [newReq, ...rs]);
       setModalOpen(false);
-      showToast(`Request ${newReq.id} created â€” pending ${newReq.teacher}'s confirmation.`);
+      showToast(`Request ${newReq.id} created — pending ${newReq.teacher}'s confirmation.`);
       navigate('makeup', 'pending-teacher');
       callBackend('createMakeup', newReq);
     }
@@ -1811,7 +1811,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
         <Nav active={route} onNavigate={navigate} onNewRequest={() => setModalOpen(true)} />
         <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">{screen}</main>
         <footer className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 text-center text-xs text-navy-300">
-          Math Mavens Thailand Â· Internal portal Â· The Sheet remains the source of truth.
+          Math Mavens Thailand · Internal portal · The Sheet remains the source of truth.
         </footer>
 
         {modalOpen && <NewMakeupModal onSubmit={addRequest} onClose={() => setModalOpen(false)} />}
@@ -1833,7 +1833,7 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
             project (or commit to a repo, set "Other" framework,
             and point the build to no command).
          2. Done. The CDN-hosted Tailwind/React/Babel scripts make
-            this a pure static site â€” no build step required.
+            this a pure static site — no build step required.
      â€¢ To wire to the live Google Sheet:
          1. In the bound Apps Script project, paste in
             apps-script/MMT_WebApp.gs and set Script Property
@@ -1849,4 +1849,3 @@ window.MMT_LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI8AAyCnCAYAAAA
 </body>
 </html>
 
-Update logo to higher-quality version
