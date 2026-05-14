@@ -1,0 +1,2496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MMT Makeup Portal — Math Mavens Thailand</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Math Mavens Thailand internal portal — makeup requests, attendance logging, weekly headcounts, roster management." />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230B2545'/><text x='16' y='22' font-family='Inter,system-ui,sans-serif' font-size='18' font-weight='800' fill='%23F4D35E' text-anchor='middle'>M</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com/3.4.5"></script>
+<script>
+  // Mirror tailwind.config.ts from the repo so the same utility names work.
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { 50:'#EEF2F8',100:'#D6DEEC',200:'#A9B8D2',300:'#7C92B9',400:'#4F6CA0',500:'#2C4A82',600:'#1A3567',700:'#0F2452',800:'#0B1B3F',900:'#07142F', DEFAULT:'#0B2545' },
+          sun:  { 50:'#FFFBEA',100:'#FFF3C4',200:'#FCE588',300:'#FADB5F',400:'#F7C948',500:'#F0B429', DEFAULT:'#F4D35E' },
+          leaf: { 50:'#E7F7F3',100:'#C2EBE0',200:'#8FD9C5',300:'#5DC6AA',400:'#2EB390',500:'#2A9D8F',600:'#1F7E73', DEFAULT:'#2A9D8F' },
+          sky:  { 50:'#EFF6FF',100:'#DBEAFE',200:'#BFDBFE',300:'#93C5FD',400:'#60A5FA',500:'#3B82F6',600:'#2563EB', DEFAULT:'#3B82F6' },
+        },
+        fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] },
+        boxShadow: {
+          card: '0 1px 3px rgba(11,37,69,0.06), 0 4px 12px rgba(11,37,69,0.04)',
+          pop:  '0 4px 14px rgba(11,37,69,0.12)',
+        },
+      },
+    },
+  };
+</script>
+<style type="text/tailwindcss">
+  @layer components {
+    .btn        { @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
+    .btn-primary{ @apply btn bg-navy text-white hover:bg-navy-700; }
+    .btn-accent { @apply btn bg-sun text-navy hover:bg-sun-400; }
+    .btn-success{ @apply btn bg-leaf text-white hover:bg-leaf-600; }
+    .btn-info   { @apply btn bg-sky text-white hover:bg-sky-600; }
+    .btn-ghost  { @apply btn bg-white text-navy border border-navy-100 hover:bg-navy-50; }
+    .card       { @apply bg-white rounded-xl shadow-card border border-navy-50; }
+    .input      { @apply w-full px-3 py-2 rounded-lg border border-navy-100 bg-white text-navy placeholder:text-navy-300 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition; }
+    .label      { @apply block text-xs font-semibold uppercase tracking-wide text-navy-500 mb-1; }
+    .chip       { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium; }
+  }
+</style>
+<style>
+  html, body { margin: 0; background: #F1F3F8; font-family: Inter, system-ui, sans-serif; }
+  .live-dot { width: 8px; height: 8px; border-radius: 999px; background: #2A9D8F; box-shadow: 0 0 0 0 rgba(42,157,143,0.6); animation: pulse 1.8s infinite; display: inline-block; }
+  @keyframes pulse {
+    0%  { box-shadow: 0 0 0 0 rgba(42,157,143,0.55); }
+    70% { box-shadow: 0 0 0 10px rgba(42,157,143,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(42,157,143,0); }
+  }
+  /* Initial loading splash so users never see a blank page while Babel compiles */
+  .splash { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: linear-gradient(180deg,#F6F8FC,#EDF2FA); z-index: 50; }
+  .splash .logo { width: 56px; height: 56px; border-radius: 14px; background: #0B2545; color: #F4D35E; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:28px; letter-spacing:-1px; box-shadow: 0 6px 24px rgba(11,37,69,0.18); }
+  .splash .sub { color: #4F6CA0; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; }
+  .splash.hidden { opacity: 0; pointer-events: none; transition: opacity .25s ease-out; }
+</style>
+
+<!-- Production React + Babel standalone (Babel is needed to compile the JSX block below at runtime). -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="splash" id="splash">
+  <div class="logo">M</div>
+  <div class="sub">Math Mavens Thailand</div>
+  <div style="color:#7C92B9; font-size:13px;">Loading portal…</div>
+</div>
+
+<div id="root"></div>
+
+<!-- ============================================================
+     CONFIG — plain JS, runs before Babel. Edit these to go live.
+     ============================================================
+     • Leave APPS_SCRIPT_URL blank to run as a self-contained demo
+       (seed data + localStorage persistence).
+     • Set both fields and BACKEND_ENABLED = true to make every
+       mutation also POST to the Apps Script Web App, so the Sheet
+       stays in sync. See apps-script/MMT_WebApp.gs for the server.
+     ============================================================ -->
+<script>
+  window.MMT_CONFIG = {
+    APPS_SCRIPT_URL: '',     // e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
+    APPS_SCRIPT_SECRET: '',  // must match the SHARED_SECRET Script Property
+    BACKEND_ENABLED: false,  // flip to true once both fields above are set
+    STORAGE_KEY: 'mmt-portal-v1',
+    TODAY: '2026-05-13',     // anchor date for the seeded demo data
+  };
+</script>
+
+<!-- ============================================================
+     DATA — roster + classes from MMT CLASS ALLOCATION 2025-2026.xlsx
+     ============================================================ -->
+<script>
+window.CLASSES = [
+  { id:'1-BT1', name:'Year 1 · Tue 15:30', teacher:'BEA',    slot:'Tue 15:30', day:'Tue', time:'15:30' },
+  { id:'1-BT2', name:'Year 1 · Fri 15:30', teacher:'BREEZE', slot:'Fri 15:30', day:'Fri', time:'15:30' },
+  { id:'1-BT3', name:'Year 1 · Sun 10:00', teacher:'BEA',    slot:'Sun 10:00', day:'Sun', time:'10:00' },
+  { id:'1-BT4', name:'Year 1 · Sun 14:30', teacher:'BREEZE', slot:'Sun 14:30', day:'Sun', time:'14:30' },
+  { id:'1-BT5', name:'Year 1 · Fri 17:15', teacher:'BEA',    slot:'Fri 17:15', day:'Fri', time:'17:15' },
+  { id:'1-BT6', name:'Year 1 · Thu 15:30', teacher:'BREEZE', slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'1-BT7', name:'Year 1 · Sat 12:30', teacher:'BREEZE', slot:'Sat 12:30', day:'Sat', time:'12:30' },
+  { id:'1-BT8', name:'Year 1 · Sat 10:00', teacher:'POND',   slot:'Sat 10:00', day:'Sat', time:'10:00' },
+  { id:'1-BT9', name:'Year 1 · Sat 14:30', teacher:'POND',   slot:'Sat 14:30', day:'Sat', time:'14:30' },
+  { id:'2-BT1', name:'Year 2 · Sat 12:30', teacher:'POND',   slot:'Sat 12:30', day:'Sat', time:'12:30' },
+  { id:'2-BT2', name:'Year 2 · Wed 17:15', teacher:'BEA',    slot:'Wed 17:15', day:'Wed', time:'17:15' },
+  { id:'2-BT3', name:'Year 2 · Fri 15:30', teacher:'BEA',    slot:'Fri 15:30', day:'Fri', time:'15:30' },
+  { id:'2-BT4', name:'Year 2 · Thu 15:30', teacher:'POND',   slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'2-BT5', name:'Year 2 · Sun 12:30', teacher:'BREEZE', slot:'Sun 12:30', day:'Sun', time:'12:30' },
+  { id:'2-BT6', name:'Year 2 · Wed 15:30', teacher:'POND',   slot:'Wed 15:30', day:'Wed', time:'15:30' },
+  { id:'2-BT7', name:'Year 2 · Thu 13:00', teacher:'POND',   slot:'Thu 13:00', day:'Thu', time:'13:00' },
+  { id:'2-BT8', name:'Year 2 · Thu 17:15', teacher:'BEA',    slot:'Thu 17:15', day:'Thu', time:'17:15' },
+  { id:'2-BT9', name:'Year 2 · Sat 10:00', teacher:'BREEZE', slot:'Sat 10:00', day:'Sat', time:'10:00' },
+  { id:'3-BT3', name:'Year 3 · Sun 10:00', teacher:'POND',   slot:'Sun 10:00', day:'Sun', time:'10:00' },
+  { id:'3-BT4', name:'Year 3 · Sun 12:30', teacher:'BEA',    slot:'Sun 12:30', day:'Sun', time:'12:30' },
+  { id:'3-BT5', name:'Year 3 · Sun 14:30', teacher:'POND',   slot:'Sun 14:30', day:'Sun', time:'14:30' },
+  { id:'4-BT1', name:'Year 4 · Tue 17:15', teacher:'BEA',    slot:'Tue 17:15', day:'Tue', time:'17:15' },
+  { id:'4-BT3', name:'Year 4 · Fri 10:30', teacher:'BREEZE', slot:'Fri 10:30', day:'Fri', time:'10:30' },
+  { id:'4-BT5', name:'Year 4 · Thu 15:30', teacher:'BEA',    slot:'Thu 15:30', day:'Thu', time:'15:30' },
+  { id:'4-BT6', name:'Year 4 · Sat 08:30', teacher:'BREEZE', slot:'Sat 08:30', day:'Sat', time:'08:30' },
+];
+
+window.STUDENTS_BY_CLASS = {
+  '2-BT1':['Elle','Niya','Ruk'],
+  '2-BT2':['Boom','Mirai','Viktor'],
+  '4-BT3':['Fong Fong','Aya','Gina'],
+  '4-BT1':['Moff','Ren','Ray'],
+  '2-BT3':['Leon','Trevor'],
+  '2-BT4':['Nest'],
+  '1-BT1':['Minnie'],
+  '1-BT3':['Miya','Gi Gi'],
+  '2-BT6':['Saori'],
+  '1-BT4':['Taj'],
+  '1-BT2':['Nava'],
+  '3-BT3':['Gisele'],
+  '1-BT5':['Meilee'],
+  '2-BT5':['Peyton'],
+  '3-BT4':['Enya','Faye'],
+  '4-BT5':['Thom'],
+  '2-BT8':['Peace'],
+  '1-BT7':['Bangpun'],
+  '2-BT7':['Jayna'],
+  '4-BT6':['Krin'],
+  '1-BT8':['B','Tasha'],
+  '3-BT5':['Alinda'],
+  '1-BT6':['Nick','Beb'],
+  '2-BT9':['Fahmai','Nampeung','Logan'],
+  '1-BT9':['Jenis'],
+};
+
+window.FULL_NAME_BY_NICK = {
+  'Elle':'Elisha Leelaapiruedee','Boom':'Thanyavee Ratanaruangruks','Fong Fong':'Jinjuta Laoprapassorn',
+  'Aya':'Pitchayapat Limkraiwut','Niya':'Nachaya Ngamachariyakul','Moff':'Nanat Ngamachariyakul',
+  'Leon':'Aritat Sahasakul','Mirai':'Pheemmaphat Leeraphan','Ruk':'Rakrada Phetprasertphol',
+  'Nest':'Phrompassorn Suriyachairung','Minnie':'Issaraporn Suvarnazorn','Miya':'Meiya Zhao',
+  'Saori':'Ansita Kanweerayothin','Taj':'Taj Pataibunlue','Nava':'Thatatt Klongpramong',
+  'Ren':'Rachanont Laosirichon','Gi Gi':'Kanvanuch Asvinvichit','Gisele':'Thannapatr Asvinvichit',
+  'Gina':'Chayanardh Asvinvichit','Meilee':'Varissaranund Klewpatinond','Peyton':'Touchtan Nilisinthop',
+  'Trevor':'Phawinith Tanawattanachaiyabul','Enya':'Enya Cheong','Thom':'Thom Ang',
+  'Peace':'Yada Dusadeevutikul','Bangpun':'Thayutithorn Thotsaphonphaisan','Viktor':'Viktor Almeada',
+  'Jayna':'Jayna Wee','Krin':'Chakrin Hansirisawasdi','B':'Chaiyathat Boonyong',
+  'Alinda':'Alinda Achariyasombat','Nick':'Nick Ronthongchai','Beb':'Phuttiseth Pisansrisin',
+  'Fahmai':'Napada Chaivorarat','Nampeung':'Chayapha Nataweepiroj','Tasha':'Natascha Florentino',
+  'Jenis':'Jenis Chiemmanisakul','Faye':'Faye Yeow Yu Xi','Logan':'Logan Hong','Ray':'Theetat Jirayukul',
+};
+
+window.TEACHERS = ['BEA','BREEZE','POND'];
+
+window.REASONS = ['Sick','Family event','Doctor appointment','School trip','Travel','Religious holiday','Other'];
+
+// Embedded MMT logo (data URI) — keeps the file fully self-contained.
+window.MMT_LOGO = 'data:image/png;base64,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';
+</script>
+
+<!-- ============================================================
+     APP CODE — JSX compiled at runtime by Babel standalone.
+     Single block keeps the file portable; all source in one place.
+     ============================================================ -->
+<script type="text/babel" data-presets="react">
+(() => {
+  const { CLASSES, STUDENTS_BY_CLASS, FULL_NAME_BY_NICK, TEACHERS, REASONS, MMT_LOGO, MMT_CONFIG } = window;
+
+  // ============================================================
+  // BACKEND (optional Apps Script Web App wiring)
+  // ============================================================
+  async function callBackend(action, payload) {
+    if (!MMT_CONFIG.BACKEND_ENABLED || !MMT_CONFIG.APPS_SCRIPT_URL) return null;
+    try {
+      const res = await fetch(MMT_CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, payload, secret: MMT_CONFIG.APPS_SCRIPT_SECRET }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'backend error');
+      return json.data;
+    } catch (err) {
+      console.warn('Apps Script call failed (', action, '):', err);
+      return null;
+    }
+  }
+
+  // ============================================================
+  // PERSISTENCE (localStorage so reloads don't lose work)
+  // ============================================================
+  const storage = {
+    load() {
+      try { return JSON.parse(localStorage.getItem(MMT_CONFIG.STORAGE_KEY) || 'null'); }
+      catch { return null; }
+    },
+    save(state) {
+      try { localStorage.setItem(MMT_CONFIG.STORAGE_KEY, JSON.stringify(state)); }
+      catch { /* quota or private mode — ignore */ }
+    },
+    clear() { try { localStorage.removeItem(MMT_CONFIG.STORAGE_KEY); } catch {} },
+  };
+
+  // ============================================================
+  // SEED DATA (matches the design prototype)
+  // ============================================================
+  const SEED_REQUESTS = [
+    { id:'MR-0142', studentNickname:'Minnie',  classId:'1-BT1', lesson:27, teacher:'BEA',
+      missedDate:'2026-05-05', proposedDate:'2026-05-17', proposedTime:'10:00',
+      teacherConfirmed:false, adminApproved:false, calendarEventCreated:false,
+      reason:'Sick', notes:'Mum asked via WhatsApp Sun evening.' },
+    { id:'MR-0141', studentNickname:'Logan',   classId:'2-BT9', lesson:29, teacher:'BREEZE',
+      missedDate:'2026-05-09', proposedDate:'2026-05-18', proposedTime:'15:30',
+      teacherConfirmed:false, adminApproved:false, calendarEventCreated:false,
+      reason:'Family event' },
+    { id:'MR-0140', studentNickname:'Gi Gi',   classId:'1-BT3', lesson:28, teacher:'BEA',
+      missedDate:'2026-05-03', proposedDate:'2026-05-16', proposedTime:'12:30',
+      teacherConfirmed:true,  adminApproved:false, calendarEventCreated:false,
+      reason:'School trip', notes:'Teacher confirmed Mon.' },
+    { id:'MR-0139', studentNickname:'Nava',    classId:'1-BT2', lesson:26, teacher:'BREEZE',
+      missedDate:'2026-04-30', proposedDate:'2026-05-15', proposedTime:'17:15',
+      teacherConfirmed:true,  adminApproved:false, calendarEventCreated:false,
+      reason:'Doctor appointment' },
+    { id:'MR-0138', studentNickname:'Aya',     classId:'4-BT3', lesson:27, teacher:'BREEZE',
+      missedDate:'2026-04-26', proposedDate:'2026-05-14', proposedTime:'10:30',
+      teacherConfirmed:true,  adminApproved:true,  calendarEventCreated:false,
+      reason:'Sick' },
+    { id:'MR-0137', studentNickname:'Niya',    classId:'2-BT1', lesson:29, teacher:'POND',
+      missedDate:'2026-05-09', proposedDate:'2026-05-13', proposedTime:'13:00',
+      teacherConfirmed:true,  adminApproved:true,  calendarEventCreated:true,
+      reason:'Family event' },
+    { id:'MR-0136', studentNickname:'Jayna',   classId:'2-BT7', lesson:28, teacher:'POND',
+      missedDate:'2026-04-30', proposedDate:'2026-05-12', proposedTime:'14:00',
+      teacherConfirmed:true,  adminApproved:true,  calendarEventCreated:true,
+      reason:'Sick' },
+    { id:'MR-0135', studentNickname:'Krin',    classId:'4-BT6', lesson:29, teacher:'BREEZE',
+      missedDate:'2026-05-09', proposedDate:'2026-05-17', proposedTime:'09:00',
+      teacherConfirmed:true,  adminApproved:true,  calendarEventCreated:false,
+      reason:'Travel' },
+  ];
+
+  const SEED_WEEK_TRACKER = [
+    { classId:'4-BT6', day:'Sat', time:'08:30', expected:1, present:1, preNotified:0, noNotice:0, status:'logged' },
+    { classId:'2-BT9', day:'Sat', time:'10:00', expected:3, present:2, preNotified:0, noNotice:1, status:'logged' },
+    { classId:'1-BT8', day:'Sat', time:'10:00', expected:2, present:2, preNotified:0, noNotice:0, status:'logged' },
+    { classId:'2-BT1', day:'Sat', time:'12:30', expected:3, present:2, preNotified:1, noNotice:0, status:'logged' },
+    { classId:'1-BT3', day:'Sun', time:'10:00', expected:2, present:2, preNotified:0, noNotice:0, status:'logged' },
+    { classId:'3-BT4', day:'Sun', time:'12:30', expected:2, present:2, preNotified:0, noNotice:0, status:'logged' },
+    { classId:'4-BT1', day:'Tue', time:'17:15', expected:3, present:0, preNotified:0, noNotice:0, status:'pending' },
+    { classId:'1-BT1', day:'Tue', time:'15:30', expected:1, present:0, preNotified:0, noNotice:0, status:'pending' },
+    { classId:'4-BT3', day:'Fri', time:'10:30', expected:3, present:0, preNotified:0, noNotice:0, status:'pending' },
+  ];
+
+  const SEED_RECENT_ATTENDANCE = [
+    { id:'A1', date:'2026-05-12', slot:'Tue 15:30', classId:'1-BT1', studentNickname:'Minnie', status:'Present' },
+    { id:'A2', date:'2026-05-10', slot:'Sun 12:30', classId:'3-BT4', studentNickname:'Enya',   status:'Present' },
+    { id:'A3', date:'2026-05-10', slot:'Sun 12:30', classId:'3-BT4', studentNickname:'Faye',   status:'Present' },
+    { id:'A4', date:'2026-05-10', slot:'Sun 10:00', classId:'1-BT3', studentNickname:'Gi Gi',  status:'Absent (pre-notified)' },
+    { id:'A5', date:'2026-05-10', slot:'Sun 10:00', classId:'1-BT3', studentNickname:'Miya',   status:'Present' },
+    { id:'A6', date:'2026-05-09', slot:'Sat 12:30', classId:'2-BT1', studentNickname:'Elle',   status:'Present' },
+    { id:'A7', date:'2026-05-09', slot:'Sat 12:30', classId:'2-BT1', studentNickname:'Ruk',    status:'Present' },
+    { id:'A8', date:'2026-05-09', slot:'Sat 12:30', classId:'2-BT1', studentNickname:'Niya',   status:'Absent (pre-notified)' },
+    { id:'A9', date:'2026-05-09', slot:'Sat 10:00', classId:'2-BT9', studentNickname:'Logan',  status:'Absent (no notice)' },
+  ];
+
+  // Auto-derive the Saturday→Friday week containing TODAY (or the real current date).
+  function weekContaining(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const dow = d.getDay();           // 0=Sun … 6=Sat
+    const daysBack = (dow + 1) % 7;   // distance back to most recent Saturday
+    const sat = new Date(d); sat.setDate(d.getDate() - daysBack);
+    const fri = new Date(sat); fri.setDate(sat.getDate() + 6);
+    const fmt = (x) => `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+    return { start: fmt(sat), end: fmt(fri) };
+  }
+  const HEADCOUNT_WEEK = weekContaining((typeof MMT_CONFIG !== 'undefined' && MMT_CONFIG.TODAY) || new Date().toISOString().slice(0,10));
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+  function deriveStatus(r) {
+    if (r.calendarEventCreated) return 'Approved & scheduled';
+    if (r.adminApproved)        return 'Approved — not yet on calendar';
+    if (r.teacherConfirmed)     return 'Pending admin manager approval';
+    return 'Pending teacher approval';
+  }
+
+  // Title format: [MAKEUP - <classId>] <Student> - Lesson <n>, 1.5h duration, Asia/Bangkok.
+  function buildCalendarUrl(r) {
+    const [y, m, d] = r.proposedDate.split('-').map(Number);
+    const [hh, mm]  = r.proposedTime.split(':').map(Number);
+    const pad = (n) => String(n).padStart(2, '0');
+    const startLocal = `${y}${pad(m)}${pad(d)}T${pad(hh)}${pad(mm)}00`;
+    let endH = hh + 1, endM = mm + 30;
+    if (endM >= 60) { endM -= 60; endH += 1; }
+    const endLocal = `${y}${pad(m)}${pad(d)}T${pad(endH)}${pad(endM)}00`;
+    const title = `[MAKEUP - ${r.classId}] ${r.studentNickname} - Lesson ${r.lesson}`;
+    const details = [
+      `Student: ${r.studentNickname}`,
+      `Class: ${r.classId}`,
+      `Lesson missed: ${r.lesson}`,
+      `Teacher: ${r.teacher}`,
+      `Original missed date: ${r.missedDate}`,
+      `Reason: ${r.reason}`,
+      r.notes ? `Notes: ${r.notes}` : '',
+      ``,
+      `Request ID: ${r.id}`,
+    ].filter(Boolean).join('\n');
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text:   title,
+      dates:  `${startLocal}/${endLocal}`,
+      ctz:    'Asia/Bangkok',
+      details,
+    });
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  function downloadCsv(filename, rows) {
+    const esc = (v) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const body = rows.map(r => r.map(esc).join(',')).join('\n');
+    const blob = new Blob([body], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // ============================================================
+  // SHARED COMPONENTS
+  // ============================================================
+  const Nav = ({ active, onNavigate, onNewRequest }) => {
+    const links = [
+      { key: 'dashboard',  label: 'Dashboard' },
+      { key: 'makeup',     label: 'Makeup Requests' },
+      { key: 'attendance', label: 'Attendance' },
+      { key: 'headcount',  label: 'Headcounts' },
+      { key: 'roster',     label: 'Roster' },
+    ];
+    return (
+      <header className="bg-navy text-white shadow-card sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <button onClick={() => onNavigate('dashboard')} className="flex items-center gap-3 group flex-shrink-0">
+            <img src={MMT_LOGO} alt="MMT" className="h-10 w-auto" />
+            <div className="leading-tight text-left hidden sm:block">
+              <div className="font-bold tracking-tight">MMT Makeup Portal</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-sun-200/80">Math Mavens Thailand</div>
+            </div>
+          </button>
+          <nav className="hidden md:flex items-center gap-1">
+            {links.map((l) => (
+              <button key={l.key} onClick={() => onNavigate(l.key)}
+                className={[
+                  'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  l.key === active ? 'bg-white/10 text-sun' : 'text-white/80 hover:text-white hover:bg-white/5'
+                ].join(' ')}
+              >{l.label}</button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-3">
+            <button onClick={onNewRequest} className="hidden md:inline-flex btn-accent !py-1.5 !text-xs">+ New Makeup</button>
+            <div className="flex items-center gap-2 text-xs text-white/70">
+              <span className="live-dot" /> Live
+            </div>
+          </div>
+        </div>
+        {/* Mobile nav */}
+        <nav className="md:hidden flex overflow-x-auto px-2 pb-2 gap-1">
+          {links.map((l) => (
+            <button key={l.key} onClick={() => onNavigate(l.key)}
+              className={[
+                'px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap',
+                l.key === active ? 'bg-white/10 text-sun' : 'text-white/70'
+              ].join(' ')}
+            >{l.label}</button>
+          ))}
+        </nav>
+      </header>
+    );
+  };
+
+  const SectionHeader = ({ eyebrow, title, description, action }) => (
+    <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+      <div>
+        {eyebrow && <div className="text-xs font-semibold uppercase tracking-[0.18em] text-leaf mb-1">{eyebrow}</div>}
+        <h1 className="text-2xl sm:text-3xl font-bold text-navy">{title}</h1>
+        {description && <p className="text-sm text-navy-400 mt-1 max-w-2xl">{description}</p>}
+      </div>
+      {action}
+    </div>
+  );
+
+  const STATUS_STYLES = {
+    'Pending teacher approval':       'bg-sun-100 text-navy-700 border border-sun-300',
+    'Pending admin manager approval': 'bg-sky-100 text-sky-600 border border-sky-200',
+    'Approved — not yet on calendar': 'bg-leaf-100 text-leaf-600 border border-leaf-200',
+    'Approved & scheduled':           'bg-navy text-white',
+    'Declined':                       'bg-red-100 text-red-700 border border-red-200',
+  };
+  const StatusBadge = ({ status }) => (
+    <span className={`chip ${STATUS_STYLES[status] ?? 'bg-navy-50 text-navy-600 border border-navy-100'}`}>{status}</span>
+  );
+
+  const Frame = ({ children }) => (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#F6F8FC] to-[#EDF2FA] text-navy" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      {children}
+    </div>
+  );
+
+  const Toast = ({ toast }) => {
+    if (!toast) return null;
+    return (
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-4">
+        <div className="card shadow-pop px-4 py-2.5 flex items-center gap-2.5 text-sm border-l-4 border-l-leaf">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2A9D8F" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span className="text-navy">{toast}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const ExportRange = ({ defaultFrom = '2025-09-01', defaultTo = '2026-05-13', label = 'records', onExport }) => {
+    const [from, setFrom] = React.useState(defaultFrom);
+    const [to, setTo]     = React.useState(defaultTo);
+    return (
+      <div className="card p-3 flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-semibold uppercase tracking-wider text-navy-500 mr-1 hidden sm:inline">Export</span>
+        <input type="date" value={from} onChange={(e)=>setFrom(e.target.value)} className="input !w-auto !py-1 text-sm" />
+        <span className="text-navy-400 text-sm">→</span>
+        <input type="date" value={to}   onChange={(e)=>setTo(e.target.value)}   className="input !w-auto !py-1 text-sm" />
+        <button className="btn-success !py-1.5" onClick={() => onExport?.(from, to)} title={`Export ${label} from ${from} to ${to}`}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export .csv
+        </button>
+      </div>
+    );
+  };
+
+  // ============================================================
+  // DASHBOARD + PIE CHART
+  // ============================================================
+  const PIE_PALETTE = ['#0B2545', '#3B82F6', '#2A9D8F', '#F4D35E', '#F0B429', '#7C92B9', '#A9B8D2', '#E76F51'];
+
+  const PieChart = ({ data, size = 220 }) => {
+    const [hover, setHover] = React.useState(null);
+    const total = data.reduce((a, b) => a + b.count, 0) || 1;
+    const cx = size / 2, cy = size / 2;
+    const R  = size * 0.42;
+    const r  = size * 0.26;
+
+    let angle = -Math.PI / 2;
+    const slices = data.map((d, i) => {
+      const frac = d.count / total;
+      let path;
+      if (frac >= 0.9999) {
+        // Single slice covering the entire ring — use two semicircle arcs to avoid
+        // a degenerate "M point → A back to same point" path that renders as nothing.
+        path = [
+          `M ${cx} ${cy - R}`,
+          `A ${R} ${R} 0 1 1 ${cx} ${cy + R}`,
+          `A ${R} ${R} 0 1 1 ${cx} ${cy - R}`,
+          `Z`,
+          `M ${cx} ${cy - r}`,
+          `A ${r} ${r} 0 1 0 ${cx} ${cy + r}`,
+          `A ${r} ${r} 0 1 0 ${cx} ${cy - r}`,
+          `Z`,
+        ].join(' ');
+        angle = angle + Math.PI * 2;
+      } else {
+        const a0 = angle;
+        const a1 = angle + frac * Math.PI * 2;
+        angle = a1;
+        const large = a1 - a0 > Math.PI ? 1 : 0;
+        const x0o = cx + R * Math.cos(a0), y0o = cy + R * Math.sin(a0);
+        const x1o = cx + R * Math.cos(a1), y1o = cy + R * Math.sin(a1);
+        const x0i = cx + r * Math.cos(a1), y0i = cy + r * Math.sin(a1);
+        const x1i = cx + r * Math.cos(a0), y1i = cy + r * Math.sin(a0);
+        path = [
+          `M ${x0o} ${y0o}`,
+          `A ${R} ${R} 0 ${large} 1 ${x1o} ${y1o}`,
+          `L ${x0i} ${y0i}`,
+          `A ${r} ${r} 0 ${large} 0 ${x1i} ${y1i}`,
+          'Z',
+        ].join(' ');
+      }
+      return { ...d, path, color: PIE_PALETTE[i % PIE_PALETTE.length], frac, i };
+    });
+
+    const focused = hover != null ? slices[hover] : null;
+    const centerLabel = focused ? `${focused.count}` : `${total}`;
+    const centerSub   = focused ? focused.reason : 'total';
+    const centerPct   = focused ? `${Math.round(focused.frac * 100)}%` : '';
+
+    if (data.reduce((a, b) => a + b.count, 0) === 0) {
+      return <div className="text-sm text-navy-400 py-10 text-center">No absences in this period.</div>;
+    }
+
+    return (
+      <div className="flex items-center gap-5 flex-wrap">
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="flex-shrink-0">
+          {slices.map((s) => {
+            const isHover = hover === s.i;
+            return (
+              <path key={s.i} d={s.path} fill={s.color} fillRule="evenodd"
+                opacity={hover == null || isHover ? 1 : 0.35}
+                style={{
+                  transition: 'opacity 160ms, transform 200ms',
+                  transformOrigin: `${cx}px ${cy}px`,
+                  transform: isHover ? 'scale(1.04)' : 'scale(1)',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => setHover(s.i)}
+                onMouseLeave={() => setHover(null)}
+              />
+            );
+          })}
+          <text x={cx} y={cy - 6} textAnchor="middle" className="fill-navy" style={{ fontSize: 28, fontWeight: 700 }}>{centerLabel}</text>
+          <text x={cx} y={cy + 14} textAnchor="middle" className="fill-navy-400" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{centerSub}</text>
+          {centerPct && <text x={cx} y={cy + 30} textAnchor="middle" className="fill-navy-500" style={{ fontSize: 11, fontWeight: 600 }}>{centerPct}</text>}
+        </svg>
+        <ul className="text-sm flex-1 min-w-0 space-y-1.5">
+          {slices.map((s) => {
+            const isHover = hover === s.i;
+            return (
+              <li key={s.i}
+                onMouseEnter={() => setHover(s.i)}
+                onMouseLeave={() => setHover(null)}
+                className={[
+                  'flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer transition',
+                  isHover ? 'bg-navy-50' : '',
+                ].join(' ')}
+              >
+                <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: s.color }} />
+                <span className="flex-1 truncate text-navy-600">{s.reason}</span>
+                <span className="tabular-nums font-semibold text-navy">{s.count}</span>
+                <span className="tabular-nums text-xs text-navy-400 w-9 text-right">{Math.round(s.frac * 100)}%</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
+
+  const Dashboard = ({ requests, attendance, onNavigate, onNewRequest }) => {
+    const reqs = requests.map(r => ({ ...r, status: deriveStatus(r) }));
+    const pendingTeacher       = reqs.filter(r => !r.teacherConfirmed);
+    const pendingAdmin         = reqs.filter(r => r.teacherConfirmed && !r.adminApproved);
+    const approvedNotScheduled = reqs.filter(r => r.adminApproved && !r.calendarEventCreated);
+    const scheduled            = reqs.filter(r => r.calendarEventCreated);
+
+    const withMakeupByReason = {};
+    for (const r of reqs) (withMakeupByReason[r.reason] = (withMakeupByReason[r.reason] || 0) + 1);
+    const withMakeup = Object.entries(withMakeupByReason)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // "Without scheduled makeup" = absences in the log that don't have a matching makeup request.
+    // Categorise by absence type; show only non-zero buckets so the chart accurately reflects state.
+    const noShowByReason = {};
+    for (const a of attendance) {
+      if (a.status === 'Absent (no notice)') {
+        noShowByReason['No notice'] = (noShowByReason['No notice'] || 0) + 1;
+      } else if (a.status === 'Absent (pre-notified)') {
+        const hasMakeup = reqs.some(r => r.studentNickname === a.studentNickname && r.missedDate === a.date);
+        if (!hasMakeup) {
+          noShowByReason['Pre-notified, no makeup yet'] = (noShowByReason['Pre-notified, no makeup yet'] || 0) + 1;
+        }
+      }
+    }
+    const withoutMakeup = Object.entries(noShowByReason)
+      .filter(([, v]) => v > 0)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const StatCard = ({ label, value, tone, onClick }) => {
+      const accents = { sun:'border-l-sun', sky:'border-l-sky', leaf:'border-l-leaf', navy:'border-l-navy' };
+      return (
+        <button onClick={onClick} className={`card p-5 border-l-4 ${accents[tone]} text-navy text-left hover:shadow-pop transition`}>
+          <div className="text-xs uppercase tracking-wider text-navy-400 font-semibold">{label}</div>
+          <div className="text-3xl font-bold mt-1">{value}</div>
+        </button>
+      );
+    };
+
+    return (
+      <div className="space-y-8">
+        <SectionHeader
+          eyebrow="Welcome to MMT"
+          title="Operations Dashboard"
+          description="Live snapshot of makeup requests across all stages. Click a stat to filter the list."
+          action={<button onClick={onNewRequest} className="btn-accent">+ New Makeup Request</button>}
+        />
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="Pending Teacher"            value={pendingTeacher.length}       tone="sun"  onClick={() => onNavigate('makeup', 'pending-teacher')} />
+          <StatCard label="Pending Admin"              value={pendingAdmin.length}         tone="sky"  onClick={() => onNavigate('makeup', 'pending-admin')} />
+          <StatCard label="Approved · Not on Calendar" value={approvedNotScheduled.length} tone="leaf" onClick={() => onNavigate('makeup', 'approved-not-scheduled')} />
+          <StatCard label="Scheduled"                  value={scheduled.length}            tone="navy" onClick={() => onNavigate('makeup', 'scheduled')} />
+        </div>
+
+        <div>
+          <div className="flex items-end justify-between mb-3 flex-wrap gap-2">
+            <div>
+              <h2 className="font-semibold text-navy text-lg">Absence summary · last 30 days</h2>
+              <p className="text-xs text-navy-400">Hover a slice or legend row to focus a reason.</p>
+            </div>
+            <div className="text-xs text-navy-400 flex items-center gap-1.5">
+              <span className="live-dot" /> live from Sheet
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <div>
+                  <div className="text-xs uppercase tracking-wider font-semibold text-leaf-600">With scheduled makeup</div>
+                  <div className="text-sm text-navy-400">Absences where a makeup class has been logged.</div>
+                </div>
+                <span className="chip bg-leaf-100 text-leaf-600 border border-leaf-200">
+                  {withMakeup.reduce((a, b) => a + b.count, 0)} absences
+                </span>
+              </div>
+              <PieChart data={withMakeup} />
+            </div>
+
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                <div>
+                  <div className="text-xs uppercase tracking-wider font-semibold text-red-500">Without scheduled makeup</div>
+                  <div className="text-sm text-navy-400">Absences with no makeup logged — action needed.</div>
+                </div>
+                <span className="chip bg-red-100 text-red-700 border border-red-200">
+                  {withoutMakeup.reduce((a, b) => a + b.count, 0)} absences
+                </span>
+              </div>
+              <PieChart data={withoutMakeup} />
+            </div>
+          </div>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="px-5 py-4 border-b border-navy-50 flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-navy">Awaiting action</h2>
+              <p className="text-xs text-navy-400">Requests that need someone on staff to move them forward.</p>
+            </div>
+            <button onClick={() => onNavigate('makeup')} className="text-sm text-sky hover:underline">See all →</button>
+          </div>
+          <div className="divide-y divide-navy-50">
+            {[...pendingTeacher, ...pendingAdmin, ...approvedNotScheduled].slice(0, 8).map(r => (
+              <button key={r.id} onClick={() => onNavigate('makeup')}
+                className="w-full flex items-center justify-between px-5 py-3 hover:bg-navy-50/40 transition text-left gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium text-navy flex items-baseline gap-2 flex-wrap">
+                    <span>{r.studentNickname}</span>
+                    <span className="text-navy-300 font-normal">· {r.classId}</span>
+                    <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px] !uppercase tracking-wider">Lesson {r.lesson}</span>
+                  </div>
+                  <div className="text-xs text-navy-400 mt-0.5">
+                    Missed {r.missedDate} → Proposed {r.proposedDate} {r.proposedTime} · {r.teacher}
+                  </div>
+                </div>
+                <StatusBadge status={r.status} />
+              </button>
+            ))}
+            {pendingTeacher.length + pendingAdmin.length + approvedNotScheduled.length === 0 && (
+              <div className="p-6 text-sm text-navy-400">Inbox zero. Nothing pending. ✨</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================
+  // MAKEUP — modal + card + list
+  // ============================================================
+  const MakeupModal = ({ onSubmit, onClose, initial = null }) => {
+    const isEdit = Boolean(initial);
+    const [classId, setClassId] = React.useState(initial?.classId ?? '');
+    const [student, setStudent] = React.useState(initial?.studentNickname ?? '');
+    const [teacher, setTeacher] = React.useState(initial?.teacher ?? '');
+    const [lesson, setLesson]   = React.useState(initial?.lesson != null ? String(initial.lesson) : '');
+    const [missedDate, setMissedDate] = React.useState(initial?.missedDate ?? '2026-05-09');
+    const [propDate, setPropDate]     = React.useState(initial?.proposedDate ?? '2026-05-17');
+    const [propTime, setPropTime]     = React.useState(initial?.proposedTime ?? '10:00');
+    const [reason, setReason]   = React.useState(initial?.reason ?? '');
+    const [notes, setNotes]     = React.useState(initial?.notes ?? '');
+    const [err, setErr] = React.useState('');
+
+    const defaultTeacher = classId ? (CLASSES.find((c) => c.id === classId)?.teacher ?? '') : '';
+    const skipFirstReset = React.useRef(isEdit);
+    React.useEffect(() => {
+      if (skipFirstReset.current) { skipFirstReset.current = false; return; }
+      setTeacher(defaultTeacher);
+      setStudent('');
+    /* eslint-disable-line */ }, [classId]);
+    const studentsForClass = classId ? (STUDENTS_BY_CLASS[classId] ?? []) : [];
+
+    function submit(e) {
+      e.preventDefault();
+      if (!classId || !student || !teacher || !lesson || !reason) {
+        setErr('Please fill in class, student, teacher, lesson number, and reason.');
+        return;
+      }
+      setErr('');
+      onSubmit({
+        classId, studentNickname: student, teacher,
+        lesson: Number(lesson), missedDate,
+        proposedDate: propDate, proposedTime: propTime,
+        reason, notes,
+      });
+    }
+
+    return (
+      <div className="fixed inset-0 z-40 flex items-start justify-center pt-16 px-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-navy-900/40 backdrop-blur-[2px]" onClick={onClose} />
+        <div className="relative w-full max-w-2xl card shadow-pop overflow-hidden my-6">
+          <div className="px-6 py-5 border-b border-navy-50 flex items-start justify-between gap-4">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-leaf">Makeup Requests</div>
+              <h2 className="text-xl font-bold text-navy mt-0.5">{isEdit ? `Edit ${initial.id}` : 'New makeup request'}</h2>
+              <p className="text-xs text-navy-400 mt-1 max-w-md">
+                {isEdit
+                  ? 'Update any details that were logged incorrectly. Approval flags are preserved.'
+                  : 'Parents request via WhatsApp — staff log it here. Teacher confirms, then the admin manager approves.'}
+              </p>
+            </div>
+            <button onClick={onClose} className="text-navy-400 hover:text-navy w-8 h-8 rounded-md hover:bg-navy-50 flex items-center justify-center" aria-label="Close">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <form className="p-6 grid gap-5" onSubmit={submit}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label">Class</label>
+                <select className="input" value={classId} onChange={(e)=>setClassId(e.target.value)}>
+                  <option value="">Select class…</option>
+                  {CLASSES.map((c) => (
+                    <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label">Student nickname</label>
+                <select className="input disabled:bg-navy-50/50 disabled:text-navy-300"
+                  value={student} onChange={(e)=>setStudent(e.target.value)} disabled={!classId}>
+                  <option value="">{classId ? 'Select student…' : 'Pick a class first'}</option>
+                  {studentsForClass.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="label">Teacher to confirm</label>
+                <select className="input disabled:bg-navy-50/50 disabled:text-navy-300"
+                  value={teacher} onChange={(e)=>setTeacher(e.target.value)} disabled={!classId}>
+                  <option value="">{classId ? 'Select teacher…' : 'Pick a class first'}</option>
+                  {TEACHERS.map((t) => (
+                    <option key={t} value={t}>{t}{t === defaultTeacher ? ' (class teacher)' : ''}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label">Lesson number missed</label>
+                <input type="number" min="1" className="input" placeholder="e.g. 27" value={lesson} onChange={(e)=>setLesson(e.target.value)} />
+              </div>
+
+              <div>
+                <label className="label">Missed date</label>
+                <input type="date" className="input" value={missedDate} onChange={(e)=>setMissedDate(e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Proposed makeup date</label>
+                <input type="date" className="input" value={propDate} onChange={(e)=>setPropDate(e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Proposed time (24h, Bangkok)</label>
+                <input type="time" className="input" value={propTime} onChange={(e)=>setPropTime(e.target.value)} />
+              </div>
+              <div />
+            </div>
+
+            <div>
+              <label className="label">Reason</label>
+              <select className="input" value={reason} onChange={(e)=>setReason(e.target.value)}>
+                <option value="">Select reason…</option>
+                {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="label">Notes (optional)</label>
+              <textarea rows={3} className="input" placeholder="Anything Ploy or the teacher should know" value={notes} onChange={(e)=>setNotes(e.target.value)} />
+            </div>
+
+            {err && <div className="text-sm text-red-600 bg-red-50 rounded-md p-3 border border-red-100">{err}</div>}
+
+            <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
+              <p className="text-xs text-navy-400 max-w-sm">
+                {isEdit
+                  ? <>Editing <strong>{initial.id}</strong>. Approval status is unchanged.</>
+                  : <>Status will start at <em>Pending teacher approval</em>. All makeup classes are <strong>1.5 hours</strong>.</>}
+              </p>
+              <div className="flex gap-2">
+                <button type="button" onClick={onClose} className="btn-ghost">Cancel</button>
+                <button type="submit" className="btn-primary">{isEdit ? 'Save changes' : 'Submit request'}</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  const MakeupCard = ({ request: r, onUpdate, onEdit, onDelete }) => {
+    const status = deriveStatus(r);
+    const calendarUrl = buildCalendarUrl(r);
+    return (
+      <article className={['card p-5 transition', r.calendarEventCreated ? 'bg-navy-50/40' : ''].join(' ')}>
+        <header className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <h3 className="text-lg font-semibold text-navy">{r.studentNickname}</h3>
+              <span className="text-sm text-navy-400">· {r.classId}</span>
+              <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px] !uppercase tracking-wider">Lesson {r.lesson}</span>
+              <span className="text-xs text-navy-300">· {r.teacher}</span>
+            </div>
+            <p className="text-sm text-navy-500 mt-0.5">
+              Missed <strong>{r.missedDate}</strong> → Proposed <strong>{r.proposedDate} {r.proposedTime}</strong>{' '}
+              <span className="text-navy-300">· 1.5h</span>
+            </p>
+          </div>
+          <StatusBadge status={status} />
+        </header>
+
+        {(r.reason || r.notes) && (
+          <div className="mt-3 text-sm text-navy-600 bg-navy-50/60 rounded-lg p-3">
+            {r.reason && <div><strong>Reason:</strong> {r.reason}</div>}
+            {r.notes && <div className="text-navy-500 mt-1">{r.notes}</div>}
+          </div>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2 items-center">
+          {!r.teacherConfirmed && (
+            <button className="btn-info" onClick={() => onUpdate(r.id, { teacherConfirmed: true })}>Teacher confirm</button>
+          )}
+          {r.teacherConfirmed && !r.adminApproved && (
+            <button className="btn-success" onClick={() => onUpdate(r.id, { adminApproved: true })}>Admin Manager approve</button>
+          )}
+          {r.adminApproved && !r.calendarEventCreated && (
+            <>
+              <a href={calendarUrl} target="_blank" rel="noopener noreferrer" className="btn-accent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                + Add to Google Calendar
+              </a>
+              <button className="btn-ghost" onClick={() => onUpdate(r.id, { calendarEventCreated: true })}>Mark scheduled</button>
+              <span className="text-[11px] font-mono text-navy-400 ml-1 truncate max-w-[280px]" title={`[MAKEUP - ${r.classId}] ${r.studentNickname} - Lesson ${r.lesson}`}>
+                [MAKEUP - {r.classId}] {r.studentNickname} - Lesson {r.lesson}
+              </span>
+            </>
+          )}
+          {r.calendarEventCreated && (
+            <span className="text-xs text-leaf-600 font-medium flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-leaf" /> On calendar · all done
+            </span>
+          )}
+          <div className="ml-auto flex items-center gap-1.5">
+            <button
+              onClick={() => onEdit?.(r)}
+              className="text-navy-400 hover:text-navy w-8 h-8 rounded-md hover:bg-navy-50 flex items-center justify-center transition"
+              aria-label={`Edit ${r.id}`}
+              title="Edit request"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <button
+              onClick={() => onDelete?.(r)}
+              className="text-navy-400 hover:text-red-500 w-8 h-8 rounded-md hover:bg-red-50 flex items-center justify-center transition"
+              aria-label={`Delete ${r.id}`}
+              title="Delete request"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+            <div className="text-xs text-navy-300 font-mono pl-1">{r.id}</div>
+          </div>
+        </div>
+      </article>
+    );
+  };
+
+  const FILTERS = [
+    { id: 'all', label: 'All' },
+    { id: 'pending-teacher', label: 'Pending teacher' },
+    { id: 'pending-admin', label: 'Pending admin' },
+    { id: 'approved-not-scheduled', label: 'Approved · need calendar' },
+    { id: 'scheduled', label: 'Scheduled' },
+  ];
+
+  const MakeupList = ({ requests, onUpdateRequest, onEditRequest, onDeleteRequest, onNewRequest, initialFilter = 'all', onToast }) => {
+    const [filter, setFilter] = React.useState(initialFilter);
+    const [query, setQuery]   = React.useState('');
+    React.useEffect(() => setFilter(initialFilter), [initialFilter]);
+
+    function filtered() {
+      let base = requests;
+      if (filter === 'pending-teacher')        base = base.filter(r => !r.teacherConfirmed);
+      else if (filter === 'pending-admin')     base = base.filter(r => r.teacherConfirmed && !r.adminApproved);
+      else if (filter === 'approved-not-scheduled') base = base.filter(r => r.adminApproved && !r.calendarEventCreated);
+      else if (filter === 'scheduled')         base = base.filter(r => r.calendarEventCreated);
+      if (query.trim()) {
+        const q = query.toLowerCase();
+        base = base.filter(r =>
+          r.studentNickname.toLowerCase().includes(q) ||
+          r.classId.toLowerCase().includes(q) ||
+          r.teacher.toLowerCase().includes(q));
+      }
+      return base;
+    }
+
+    function handleExport(from, to) {
+      const inRange = (d) => d >= from && d <= to;
+      const matches = requests.filter(r => inRange(r.missedDate) || inRange(r.proposedDate));
+      const rows = [
+        ['Request ID','Class','Student','Lesson','Teacher','Missed date','Proposed date','Proposed time','Reason','Status','Notes'],
+        ...matches.map(r => [r.id, r.classId, r.studentNickname, r.lesson, r.teacher, r.missedDate, r.proposedDate, r.proposedTime, r.reason, deriveStatus(r), r.notes || ''])
+      ];
+      downloadCsv(`makeup-requests_${from}_to_${to}.csv`, rows);
+      onToast?.(`Exported ${matches.length} makeup request${matches.length === 1 ? '' : 's'} (${from} → ${to})`);
+    }
+
+    const rows = filtered();
+
+    return (
+      <div className="space-y-6">
+        <SectionHeader
+          eyebrow="Workflow"
+          title="Makeup Requests"
+          description="Submit, approve, and schedule makeup classes. All classes are 1.5 hours."
+          action={<button className="btn-accent" onClick={onNewRequest}>+ New Request</button>}
+        />
+
+        <div className="flex flex-wrap items-center gap-2">
+          {FILTERS.map(f => (
+            <button key={f.id} onClick={() => setFilter(f.id)}
+              className={[
+                'px-3 py-1.5 rounded-full text-xs font-medium transition',
+                f.id === filter ? 'bg-navy text-white' : 'bg-white text-navy-600 border border-navy-100 hover:bg-navy-50'
+              ].join(' ')}>{f.label}</button>
+          ))}
+          <input value={query} onChange={(e)=>setQuery(e.target.value)} className="input ml-auto max-w-xs" placeholder="Search by student, class, teacher…" />
+        </div>
+
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-xs text-navy-400">
+            Showing <strong className="text-navy">{rows.length}</strong> of {requests.length} requests
+          </div>
+          <ExportRange label="makeup requests" onExport={handleExport} />
+        </div>
+
+        <div className="grid gap-3">
+          {rows.map(r => <MakeupCard key={r.id} request={r} onUpdate={onUpdateRequest} onEdit={onEditRequest} onDelete={onDeleteRequest} />)}
+          {rows.length === 0 && (
+            <div className="card p-10 text-center text-sm text-navy-400">No requests in this view.</div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================
+  // ATTENDANCE — weekly tracker + log roster + recent log
+  // ============================================================
+  const STATUS_BTNS = ['Present', 'Absent (no notice)', 'Absent (pre-notified)'];
+
+  const AttendanceChip = ({ status }) => {
+    const map = {
+      'Present':               'bg-leaf-100 text-leaf-600 border border-leaf-200',
+      'Absent (no notice)':    'bg-red-100 text-red-700 border border-red-200',
+      'Absent (pre-notified)': 'bg-sky-100 text-sky-600 border border-sky-200',
+      'Makeup attendee':       'bg-sun-100 text-navy-700 border border-sun-300',
+      'Trial':                 'bg-navy-50 text-navy-600 border border-navy-100',
+      'Workshop attendee':     'bg-sky-50 text-sky-700 border border-sky-200',
+    };
+    return <span className={`chip ${map[status] ?? ''}`}>{status}</span>;
+  };
+
+  // Special class-ID markers for non-regular sessions.
+  const OFF_SCHEDULE_ID = 'OFF-SCHEDULE';
+  const WORKSHOP_ID     = 'WORKSHOP';
+  const isSpecialClassId = (id) => id === OFF_SCHEDULE_ID || id === WORKSHOP_ID;
+  const displayClassId = (id) => id === OFF_SCHEDULE_ID ? 'Off-schedule' : (id === WORKSHOP_ID ? 'Workshop' : id);
+
+  // Reusable picker — search students across all classes.
+  const StudentPickerPopover = ({ excludeKeys = new Set(), onSelect, onClose, title = 'Add student' }) => {
+    const [q, setQ] = React.useState('');
+    const all = React.useMemo(() => {
+      const out = [];
+      for (const [classId, nicks] of Object.entries(STUDENTS_BY_CLASS)) {
+        for (const nick of nicks) out.push({ nickname: nick, classId, fullName: FULL_NAME_BY_NICK[nick] || '' });
+      }
+      return out.sort((a, b) => a.nickname.localeCompare(b.nickname));
+    }, []);
+    const filtered = q.trim()
+      ? all.filter(s => {
+          const t = q.toLowerCase();
+          return s.nickname.toLowerCase().includes(t) || s.classId.toLowerCase().includes(t) || s.fullName.toLowerCase().includes(t);
+        })
+      : all;
+    return (
+      <div className="fixed inset-0 z-40 flex items-start justify-center pt-20 px-4">
+        <div className="fixed inset-0 bg-navy-900/40 backdrop-blur-[2px]" onClick={onClose} />
+        <div className="relative w-full max-w-md card shadow-pop overflow-hidden">
+          <div className="px-4 py-3 border-b border-navy-50 flex items-center justify-between">
+            <div className="font-semibold text-navy text-sm">{title}</div>
+            <button onClick={onClose} className="text-navy-400 hover:text-navy w-7 h-7 rounded-md hover:bg-navy-50 flex items-center justify-center" aria-label="Close">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div className="p-3 border-b border-navy-50">
+            <input autoFocus className="input" placeholder="Search by name or class…" value={q} onChange={(e)=>setQ(e.target.value)} />
+          </div>
+          <ul className="max-h-72 overflow-y-auto divide-y divide-navy-50">
+            {filtered.length === 0 && <li className="p-4 text-sm text-navy-400">No matches.</li>}
+            {filtered.map(s => {
+              const key = s.nickname + '|' + s.classId;
+              const disabled = excludeKeys.has(key);
+              return (
+                <li key={key}>
+                  <button
+                    disabled={disabled}
+                    onClick={() => onSelect(s)}
+                    className={`w-full text-left px-4 py-2 flex items-center justify-between gap-3 transition ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-navy-50/60'}`}
+                  >
+                    <div>
+                      <div className="font-medium text-navy text-sm">{s.nickname}</div>
+                      {s.fullName && <div className="text-[11px] text-navy-300">{s.fullName}</div>}
+                    </div>
+                    <span className="chip bg-navy-50 text-navy-500 border border-navy-100 !text-[10px]">{s.classId}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  const WeeklyTracker = ({ tracker }) => {
+    const [hover, setHover] = React.useState(null);
+    return (
+      <div className="card overflow-hidden">
+        <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 className="font-semibold text-navy">Weekly attendance tracker</h2>
+            <p className="text-xs text-navy-400">Week of <strong>Sat 9 May → Fri 15 May 2026</strong> · stacked bars show Present / Pre-notified / No notice.</p>
+          </div>
+          <div className="flex items-center gap-3 text-[11px] text-navy-500 flex-wrap">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-leaf" /> Present</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-sky" /> Pre-notified</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-red-400" /> No notice</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-navy-100" /> Not yet logged</span>
+          </div>
+        </div>
+
+        <ul className="divide-y divide-navy-50">
+          {tracker.map((c, i) => {
+            const cls = CLASSES.find(x => x.id === c.classId);
+            const logged = c.status === 'logged';
+            const accounted = c.present + c.preNotified + c.noNotice;
+            const unlogged  = logged ? Math.max(0, c.expected - accounted) : c.expected;
+            const max = c.expected || 1;
+            const pct = (n) => `${(n / max) * 100}%`;
+            const isHover = hover === i;
+            return (
+              <li key={c.classId + i}
+                onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
+                className={`px-5 py-3 grid grid-cols-12 gap-3 items-center transition ${isHover ? 'bg-navy-50/40' : ''}`}>
+                <div className="col-span-4 sm:col-span-2">
+                  <div className="font-mono text-sm text-navy font-semibold">{c.classId}</div>
+                  <div className="text-xs text-navy-400">{cls?.teacher ?? ''}</div>
+                </div>
+                <div className="col-span-4 sm:col-span-2 text-sm text-navy-600">
+                  <div className="font-medium">{c.day} {c.time}</div>
+                  <div className="text-xs text-navy-300">{logged ? 'Logged' : 'Not yet logged'}</div>
+                </div>
+                <div className="col-span-12 sm:col-span-6 order-last sm:order-none">
+                  <div className="h-3 rounded-full bg-navy-50 overflow-hidden flex">
+                    {logged ? (
+                      <>
+                        <div className="bg-leaf h-full transition-all"    style={{ width: pct(c.present) }} title={`Present: ${c.present}`} />
+                        <div className="bg-sky h-full transition-all"     style={{ width: pct(c.preNotified) }} title={`Pre-notified: ${c.preNotified}`} />
+                        <div className="bg-red-400 h-full transition-all" style={{ width: pct(c.noNotice) }} title={`No notice: ${c.noNotice}`} />
+                        {unlogged > 0 && <div className="bg-navy-100 h-full" style={{ width: pct(unlogged) }} />}
+                      </>
+                    ) : (
+                      <div className="h-full w-full" style={{
+                        background: 'repeating-linear-gradient(45deg, #D6DEEC 0 6px, transparent 6px 12px)'
+                      }} />
+                    )}
+                  </div>
+                  <div className="mt-1 text-[11px] text-navy-400 flex gap-3 flex-wrap">
+                    {logged ? (
+                      <>
+                        <span><strong className="text-leaf-600">{c.present}</strong> present</span>
+                        {c.preNotified > 0 && <span><strong className="text-sky-600">{c.preNotified}</strong> pre-notified</span>}
+                        {c.noNotice > 0    && <span><strong className="text-red-600">{c.noNotice}</strong> no notice</span>}
+                      </>
+                    ) : (
+                      <span className="text-navy-300">Roster not submitted yet</span>
+                    )}
+                  </div>
+                </div>
+                <div className="col-span-4 sm:col-span-2 text-right">
+                  <div className="text-xs text-navy-400 uppercase tracking-wider font-semibold">Attended</div>
+                  <div className="font-bold tabular-nums text-navy">
+                    {logged ? c.present : 0}<span className="text-navy-300 font-normal"> / {c.expected}</span>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
+
+  const ATTENDANCE_STATUSES     = ['Present', 'Absent (no notice)', 'Absent (pre-notified)'];
+  const ATTENDANCE_STATUSES_ALL = ['Present', 'Absent (no notice)', 'Absent (pre-notified)', 'Makeup attendee', 'Trial', 'Workshop attendee'];
+
+  // -------- Regular class attendance form (with extras section) --------
+  const RegularClassForm = ({ onLogSession, onToast }) => {
+    const today = MMT_CONFIG.TODAY;
+    const [date, setDate]         = React.useState(today);
+    const [classId, setClassId]   = React.useState('');
+    const [statuses, setStatuses] = React.useState({});
+    const [extras, setExtras]     = React.useState([]); // [{ kind:'makeup'|'trial', nickname, sourceClass? }]
+    const [notes, setNotes]       = React.useState('');
+    const [picker, setPicker]     = React.useState(null); // 'makeup' | 'trial' | null
+    const [trialName, setTrialName] = React.useState('');
+
+    const selectedClass = CLASSES.find(c => c.id === classId);
+    const roster  = classId ? (STUDENTS_BY_CLASS[classId] ?? []) : [];
+    const teacher = selectedClass?.teacher ?? '';
+
+    const setStatus = (nick, st) => setStatuses(s => ({ ...s, [nick]: st }));
+    const removeExtra = (idx) => setExtras(es => es.filter((_, i) => i !== idx));
+
+    function addMakeup(s) {
+      const exists = extras.some(e => e.kind === 'makeup' && e.nickname === s.nickname && e.sourceClass === s.classId);
+      if (!exists) setExtras(e => [...e, { kind: 'makeup', nickname: s.nickname, sourceClass: s.classId }]);
+      setPicker(null);
+    }
+    function addTrial(e) {
+      e.preventDefault();
+      const name = trialName.trim();
+      if (!name) return;
+      setExtras(es => [...es, { kind: 'trial', nickname: name }]);
+      setTrialName('');
+      setPicker(null);
+    }
+
+    function save() {
+      if (!classId) { onToast?.('Pick a class first.'); return; }
+      const slot = selectedClass.slot;
+      const base = Date.now();
+      const rows = roster.map((nick, i) => ({
+        id: `A${base}-${i}`,
+        date, slot, classId, teacher,
+        studentNickname: nick,
+        status: statuses[nick] ?? 'Absent (no notice)',
+        notes,
+      }));
+      extras.forEach((ex, i) => {
+        rows.push({
+          id: `A${base}-x${i}`,
+          date, slot, classId, teacher,
+          studentNickname: ex.nickname,
+          status: ex.kind === 'makeup' ? 'Makeup attendee' : 'Trial',
+          notes: ex.kind === 'makeup'
+            ? `From ${ex.sourceClass}${notes ? ' · ' + notes : ''}`
+            : (notes || ''),
+        });
+      });
+      onLogSession(rows);
+      onToast?.(`Logged ${rows.length} row${rows.length === 1 ? '' : 's'} for ${classId}.`);
+      setStatuses({}); setExtras([]); setNotes('');
+    }
+
+    const excludeSet = new Set([
+      ...roster.map(n => n + '|' + classId),
+      ...extras.filter(e => e.kind === 'makeup').map(e => e.nickname + '|' + e.sourceClass),
+    ]);
+
+    return (
+      <>
+        <div className="card p-5 grid gap-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-navy-500">Log a regular class session</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Class date</label>
+              <input type="date" className="input" value={date} onChange={(e)=>setDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Class</label>
+              <select className="input" value={classId} onChange={(e)=>{ setClassId(e.target.value); setStatuses({}); setExtras([]); }}>
+                <option value="">Select class…</option>
+                {CLASSES.map((c) => (
+                  <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {classId && (
+          <div className="card overflow-hidden">
+            <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
+              <div className="font-semibold text-navy">
+                Roster · {classId} <span className="text-navy-400 font-normal">· {roster.length} student{roster.length === 1 ? '' : 's'} · {teacher}</span>
+              </div>
+              <div className="text-xs text-navy-400">Default = Absent (no notice). Toggle as you go.</div>
+            </div>
+            {roster.length === 0 ? (
+              <div className="p-6 text-sm text-navy-400">No active students mapped to {classId}.</div>
+            ) : (
+              <ul className="divide-y divide-navy-50">
+                {roster.map(nick => {
+                  const active = statuses[nick] ?? '';
+                  const fullName = FULL_NAME_BY_NICK[nick];
+                  return (
+                    <li key={nick} className="px-5 py-3 flex items-center justify-between gap-4 flex-wrap">
+                      <div>
+                        <div className="font-medium text-navy">{nick}</div>
+                        {fullName && <div className="text-xs text-navy-300">{fullName}</div>}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {STATUS_BTNS.map(st => {
+                          const isActive = active === st;
+                          const tone = st === 'Present'
+                            ? (isActive ? 'bg-leaf text-white' : 'border border-leaf text-leaf-600 hover:bg-leaf-50')
+                            : st === 'Absent (pre-notified)'
+                            ? (isActive ? 'bg-sky text-white' : 'border border-sky text-sky-600 hover:bg-sky-50')
+                            : (isActive ? 'bg-red-500 text-white' : 'border border-red-300 text-red-600 hover:bg-red-50');
+                          return (
+                            <button key={st} className={`text-xs px-2.5 py-1 rounded-full transition ${tone}`} onClick={() => setStatus(nick, st)}>
+                              {st}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {/* Additional attendees: makeup students from other classes + trial students */}
+            <div className="px-5 py-3 border-t border-navy-50 bg-navy-50/30 flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <div className="font-semibold text-navy text-sm">Additional attendees</div>
+                <div className="text-xs text-navy-400">Makeup students from other classes, or trial students.</div>
+              </div>
+              <div className="flex gap-1.5">
+                <button className="btn-ghost !py-1.5 !text-xs" onClick={() => setPicker('makeup')}>+ Makeup attendee</button>
+                <button className="btn-ghost !py-1.5 !text-xs" onClick={() => setPicker('trial')}>+ Trial student</button>
+              </div>
+            </div>
+            {extras.length > 0 ? (
+              <ul className="divide-y divide-navy-50">
+                {extras.map((ex, idx) => (
+                  <li key={idx} className="px-5 py-2.5 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <AttendanceChip status={ex.kind === 'makeup' ? 'Makeup attendee' : 'Trial'} />
+                      <span className="font-medium text-navy">{ex.nickname}</span>
+                      {ex.kind === 'makeup' && <span className="text-xs text-navy-400">from {ex.sourceClass}</span>}
+                    </div>
+                    <button onClick={() => removeExtra(idx)} className="text-navy-300 hover:text-red-500 w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center transition" aria-label="Remove">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="px-5 py-3 text-xs text-navy-400">No extras added yet.</div>
+            )}
+
+            <div className="p-5 border-t border-navy-50 grid gap-3">
+              <label className="label">Notes for this session (optional)</label>
+              <textarea rows={2} className="input" value={notes} onChange={(e)=>setNotes(e.target.value)} placeholder="Anything notable about this session…" />
+              <div className="flex justify-end">
+                <button className="btn-primary" onClick={save} disabled={roster.length === 0 && extras.length === 0}>
+                  Save {roster.length + extras.length} row{(roster.length + extras.length) === 1 ? '' : 's'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {picker === 'makeup' && (
+          <StudentPickerPopover
+            title="Add makeup attendee"
+            excludeKeys={excludeSet}
+            onSelect={addMakeup}
+            onClose={() => setPicker(null)}
+          />
+        )}
+        {picker === 'trial' && (
+          <div className="fixed inset-0 z-40 flex items-start justify-center pt-20 px-4">
+            <div className="fixed inset-0 bg-navy-900/40 backdrop-blur-[2px]" onClick={() => setPicker(null)} />
+            <div className="relative w-full max-w-sm card shadow-pop overflow-hidden">
+              <div className="px-4 py-3 border-b border-navy-50 font-semibold text-navy text-sm">Add trial student</div>
+              <form onSubmit={addTrial} className="p-4 grid gap-3">
+                <div>
+                  <label className="label">Trial student nickname</label>
+                  <input autoFocus className="input" value={trialName} onChange={(e)=>setTrialName(e.target.value)} placeholder="e.g. Mango" />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button type="button" className="btn-ghost !py-1.5" onClick={() => setPicker(null)}>Cancel</button>
+                  <button type="submit" className="btn-primary !py-1.5" disabled={!trialName.trim()}>Add</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // -------- Off-schedule makeup form --------
+  const OffScheduleMakeupForm = ({ onLogSession, onToast }) => {
+    const today = MMT_CONFIG.TODAY;
+    const [date, setDate]       = React.useState(today);
+    const [time, setTime]       = React.useState('14:00');
+    const [teacher, setTeacher] = React.useState(TEACHERS[0]);
+    const [attendees, setAttendees] = React.useState([]); // [{ nickname, sourceClass }]
+    const [notes, setNotes]     = React.useState('');
+    const [picker, setPicker]   = React.useState(false);
+
+    const removeAttendee = (idx) => setAttendees(a => a.filter((_, i) => i !== idx));
+    const addAttendee = (s) => {
+      const exists = attendees.some(a => a.nickname === s.nickname && a.sourceClass === s.classId);
+      if (!exists) setAttendees(a => [...a, { nickname: s.nickname, sourceClass: s.classId }]);
+      setPicker(false);
+    };
+
+    function save() {
+      if (attendees.length === 0) { onToast?.('Add at least one student.'); return; }
+      const slot = `Off-schedule · ${time}`;
+      const base = Date.now();
+      const rows = attendees.map((a, i) => ({
+        id: `A${base}-${i}`,
+        date, slot, classId: OFF_SCHEDULE_ID, teacher,
+        studentNickname: a.nickname,
+        status: 'Makeup attendee',
+        notes: `From ${a.sourceClass}${notes ? ' · ' + notes : ''}`,
+      }));
+      onLogSession(rows);
+      onToast?.(`Logged ${rows.length} off-schedule makeup row${rows.length === 1 ? '' : 's'} with ${teacher}.`);
+      setAttendees([]); setNotes('');
+    }
+
+    const excludeSet = new Set(attendees.map(a => a.nickname + '|' + a.sourceClass));
+
+    return (
+      <>
+        <div className="card p-5 grid gap-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-navy-500">Log an off-schedule makeup</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="label">Date</label>
+              <input type="date" className="input" value={date} onChange={(e)=>setDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Time</label>
+              <input type="time" className="input" value={time} onChange={(e)=>setTime(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Teacher</label>
+              <select className="input" value={teacher} onChange={(e)=>setTeacher(e.target.value)}>
+                {TEACHERS.map(t => <option key={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <div className="font-semibold text-navy">Makeup attendees <span className="text-navy-400 font-normal">· {attendees.length}</span></div>
+              <div className="text-xs text-navy-400">Add students who attended this off-schedule makeup.</div>
+            </div>
+            <button className="btn-ghost !py-1.5 !text-xs" onClick={() => setPicker(true)}>+ Add student</button>
+          </div>
+          {attendees.length === 0 ? (
+            <div className="p-6 text-sm text-navy-400">No attendees yet. Add at least one student above.</div>
+          ) : (
+            <ul className="divide-y divide-navy-50">
+              {attendees.map((a, idx) => (
+                <li key={idx} className="px-5 py-2.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <AttendanceChip status="Makeup attendee" />
+                    <span className="font-medium text-navy">{a.nickname}</span>
+                    <span className="text-xs text-navy-400">from {a.sourceClass}</span>
+                  </div>
+                  <button onClick={() => removeAttendee(idx)} className="text-navy-300 hover:text-red-500 w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center transition" aria-label="Remove">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="p-5 border-t border-navy-50 grid gap-3">
+            <label className="label">Notes (optional)</label>
+            <textarea rows={2} className="input" value={notes} onChange={(e)=>setNotes(e.target.value)} placeholder="Anything notable…" />
+            <div className="flex justify-end">
+              <button className="btn-primary" onClick={save} disabled={attendees.length === 0}>
+                Save {attendees.length} row{attendees.length === 1 ? '' : 's'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {picker && (
+          <StudentPickerPopover
+            title="Add makeup attendee"
+            excludeKeys={excludeSet}
+            onSelect={addAttendee}
+            onClose={() => setPicker(false)}
+          />
+        )}
+      </>
+    );
+  };
+
+  // -------- Workshop form --------
+  const WorkshopForm = ({ onLogSession, onToast }) => {
+    const today = MMT_CONFIG.TODAY;
+    const [date, setDate]                 = React.useState(today);
+    const [time, setTime]                 = React.useState('14:00');
+    const [teacher, setTeacher]           = React.useState(TEACHERS[0]);
+    const [workshopName, setWorkshopName] = React.useState('');
+    const [attendees, setAttendees]       = React.useState([]); // string[]
+    const [newName, setNewName]           = React.useState('');
+
+    const removeAttendee = (idx) => setAttendees(a => a.filter((_, i) => i !== idx));
+
+    function addAttendee(e) {
+      e.preventDefault();
+      const name = newName.trim();
+      if (!name || attendees.includes(name)) { setNewName(''); return; }
+      setAttendees(a => [...a, name]);
+      setNewName('');
+    }
+
+    function save() {
+      if (!workshopName.trim()) { onToast?.('Add a workshop name.'); return; }
+      if (attendees.length === 0) { onToast?.('Add at least one attendee.'); return; }
+      const slot = `Workshop · ${time}`;
+      const base = Date.now();
+      const rows = attendees.map((nick, i) => ({
+        id: `A${base}-${i}`,
+        date, slot, classId: WORKSHOP_ID, teacher,
+        studentNickname: nick,
+        status: 'Workshop attendee',
+        notes: workshopName.trim(),
+      }));
+      onLogSession(rows);
+      onToast?.(`Logged ${rows.length} workshop row${rows.length === 1 ? '' : 's'} for "${workshopName.trim()}" with ${teacher}.`);
+      setAttendees([]); setWorkshopName('');
+    }
+
+    return (
+      <>
+        <div className="card p-5 grid gap-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-navy-500">Log a workshop</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Date</label>
+              <input type="date" className="input" value={date} onChange={(e)=>setDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Time</label>
+              <input type="time" className="input" value={time} onChange={(e)=>setTime(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Teacher</label>
+              <select className="input" value={teacher} onChange={(e)=>setTeacher(e.target.value)}>
+                {TEACHERS.map(t => <option key={t}>{t}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label">Workshop name</label>
+              <input className="input" value={workshopName} onChange={(e)=>setWorkshopName(e.target.value)} placeholder="e.g. Algebra refresher" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <div className="font-semibold text-navy">Attendees <span className="text-navy-400 font-normal">· {attendees.length}</span></div>
+              <div className="text-xs text-navy-400">Type a nickname and press Add. Workshop attendees aren't from any specific class roster.</div>
+            </div>
+            <form onSubmit={addAttendee} className="flex gap-1.5">
+              <input className="input !py-1.5 text-sm" style={{width: '160px'}} value={newName} onChange={(e)=>setNewName(e.target.value)} placeholder="Nickname" />
+              <button type="submit" className="btn-ghost !py-1.5 !text-xs" disabled={!newName.trim()}>+ Add</button>
+            </form>
+          </div>
+          {attendees.length === 0 ? (
+            <div className="p-6 text-sm text-navy-400">No attendees yet.</div>
+          ) : (
+            <ul className="divide-y divide-navy-50">
+              {attendees.map((a, idx) => (
+                <li key={idx} className="px-5 py-2.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <AttendanceChip status="Workshop attendee" />
+                    <span className="font-medium text-navy">{a}</span>
+                  </div>
+                  <button onClick={() => removeAttendee(idx)} className="text-navy-300 hover:text-red-500 w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center transition" aria-label="Remove">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="p-5 border-t border-navy-50 flex justify-end">
+            <button className="btn-primary" onClick={save} disabled={attendees.length === 0 || !workshopName.trim()}>
+              Save {attendees.length} row{attendees.length === 1 ? '' : 's'}
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  // -------- Recent attendance table (shared) --------
+  const RecentAttendanceTable = ({ recent, onUpdateAttendance, onDeleteAttendance }) => (
+    <div className="card overflow-hidden">
+      <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between">
+        <h2 className="font-semibold text-navy">Recent attendance</h2>
+        <div className="text-xs text-navy-400 flex items-center gap-1.5">
+          <span className="live-dot" /> live
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="text-xs uppercase text-navy-400 bg-navy-50/40">
+            <tr>
+              <th className="text-left px-5 py-2 font-medium">Date</th>
+              <th className="text-left px-5 py-2 font-medium">Slot</th>
+              <th className="text-left px-5 py-2 font-medium">Class / Session</th>
+              <th className="text-left px-5 py-2 font-medium">Teacher</th>
+              <th className="text-left px-5 py-2 font-medium">Student</th>
+              <th className="text-left px-5 py-2 font-medium">Status</th>
+              <th className="text-right px-5 py-2 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recent.slice(0, 50).map(r => (
+              <tr key={r.id} className="border-t border-navy-50">
+                <td className="px-5 py-2">{r.date}</td>
+                <td className="px-5 py-2 text-navy-500">{r.slot}</td>
+                <td className="px-5 py-2">
+                  {isSpecialClassId(r.classId)
+                    ? <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px]">{displayClassId(r.classId)}</span>
+                    : <span className="font-mono">{r.classId}</span>}
+                </td>
+                <td className="px-5 py-2 text-navy-500">{r.teacher || ''}</td>
+                <td className="px-5 py-2 font-medium">{r.studentNickname}</td>
+                <td className="px-5 py-2"><AttendanceChip status={r.status} /></td>
+                <td className="px-5 py-2">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <select
+                      value={r.status}
+                      onChange={(e) => onUpdateAttendance?.(r.id, { status: e.target.value })}
+                      className="text-xs px-2 py-1 rounded-md border border-navy-100 bg-white text-navy-600 hover:border-navy-300 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                      title="Change status"
+                    >
+                      {ATTENDANCE_STATUSES_ALL.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                    <button
+                      onClick={() => onDeleteAttendance?.(r)}
+                      className="text-navy-300 hover:text-red-500 w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center transition"
+                      aria-label={`Delete attendance for ${r.studentNickname}`}
+                      title="Delete entry"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {recent.length === 0 && (
+              <tr><td className="px-5 py-4 text-navy-400" colSpan={7}>No attendance yet.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  // -------- Parent component: mode tabs + WeeklyTracker + form + recent --------
+  const Attendance = ({ tracker, recent, onLogSession, onUpdateAttendance, onDeleteAttendance, onToast }) => {
+    const [mode, setMode] = React.useState('regular'); // 'regular' | 'off-schedule' | 'workshop'
+    const MODES = [
+      { id: 'regular',      label: 'Regular class' },
+      { id: 'off-schedule', label: 'Off-schedule makeup' },
+      { id: 'workshop',     label: 'Workshop' },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <SectionHeader
+          eyebrow="Daily logging"
+          title="Class Attendance"
+          description="Log regular classes, off-schedule makeups, and workshops. Each row counts toward the teacher's weekly headcount."
+        />
+
+        <WeeklyTracker tracker={tracker} />
+
+        <div className="flex flex-wrap gap-1.5 items-center">
+          {MODES.map(m => (
+            <button
+              key={m.id}
+              onClick={() => setMode(m.id)}
+              className={['px-3 py-1.5 rounded-full text-xs font-medium transition',
+                m.id === mode ? 'bg-navy text-white' : 'bg-white text-navy-600 border border-navy-100 hover:bg-navy-50'
+              ].join(' ')}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        {mode === 'regular'      && <RegularClassForm      onLogSession={onLogSession} onToast={onToast} />}
+        {mode === 'off-schedule' && <OffScheduleMakeupForm onLogSession={onLogSession} onToast={onToast} />}
+        {mode === 'workshop'     && <WorkshopForm          onLogSession={onLogSession} onToast={onToast} />}
+
+        <RecentAttendanceTable recent={recent} onUpdateAttendance={onUpdateAttendance} onDeleteAttendance={onDeleteAttendance} />
+      </div>
+    );
+  };
+
+  // ============================================================
+  // HEADCOUNTS — per-teacher summary + tables
+  // ============================================================
+  const TEACHER_TONES = {
+    BEA:    { bg: 'bg-leaf',   bg50: 'bg-leaf-50',   text: 'text-leaf-600',   border: 'border-leaf-200',   chip: 'bg-leaf-100 text-leaf-600 border border-leaf-200' },
+    BREEZE: { bg: 'bg-sky',    bg50: 'bg-sky-50',    text: 'text-sky-600',    border: 'border-sky-200',    chip: 'bg-sky-100 text-sky-600 border border-sky-200' },
+    POND:   { bg: 'bg-sun-500',bg50: 'bg-sun-50',    text: 'text-navy-700',   border: 'border-sun-300',    chip: 'bg-sun-100 text-navy-700 border border-sun-300' },
+  };
+  const teacherTone = (t) => TEACHER_TONES[t] ?? TEACHER_TONES.BEA;
+
+  const TeacherSummaryCard = ({ teacher, rows, isActive, onClick }) => {
+    const totals = rows.reduce((acc, r) => ({
+      classes:   acc.classes   + (r.isSpecial ? 0 : 1),
+      actual:    acc.actual    + r.actual,
+      makeups:   acc.makeups   + r.makeups,
+      trials:    acc.trials    + r.trials,
+      workshops: acc.workshops + (r.workshops || 0),
+      total:     acc.total     + r.total,
+    }), { classes: 0, actual: 0, makeups: 0, trials: 0, workshops: 0, total: 0 });
+    const tone = teacherTone(teacher);
+
+    return (
+      <button
+        onClick={onClick}
+        className={[
+          'card text-left p-5 transition border-t-4 hover:shadow-pop',
+          isActive ? `${tone.border} shadow-pop` : 'border-transparent',
+        ].join(' ')}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-9 h-9 rounded-full ${tone.bg} flex items-center justify-center text-white font-bold text-sm`}>
+              {teacher.slice(0, 2)}
+            </div>
+            <div>
+              <div className="font-bold text-navy tracking-tight">{teacher}</div>
+              <div className="text-[11px] uppercase tracking-wider text-navy-400 font-semibold">{totals.classes} classes</div>
+            </div>
+          </div>
+          <span className={`chip ${tone.chip} !text-[10px]`}>Bonus base</span>
+        </div>
+        <div className="mt-4 flex items-baseline gap-2">
+          <div className="text-4xl font-bold text-navy tabular-nums">{totals.total}</div>
+          <div className="text-xs text-navy-400 uppercase tracking-wider font-semibold">students taught</div>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+          <div className="bg-navy-50/60 rounded-md py-1.5">
+            <div className="text-[10px] uppercase text-navy-400 font-semibold tracking-wider">Regular</div>
+            <div className="font-bold text-navy tabular-nums">{totals.actual}</div>
+          </div>
+          <div className="bg-sun-100/60 rounded-md py-1.5">
+            <div className="text-[10px] uppercase text-navy-400 font-semibold tracking-wider">Makeups</div>
+            <div className="font-bold text-navy tabular-nums">{totals.makeups}</div>
+          </div>
+          <div className="bg-navy-50/60 rounded-md py-1.5">
+            <div className="text-[10px] uppercase text-navy-400 font-semibold tracking-wider">Trials</div>
+            <div className="font-bold text-navy tabular-nums">{totals.trials}</div>
+          </div>
+          <div className="bg-sky-100/60 rounded-md py-1.5">
+            <div className="text-[10px] uppercase text-navy-400 font-semibold tracking-wider">Workshop</div>
+            <div className="font-bold text-navy tabular-nums">{totals.workshops}</div>
+          </div>
+        </div>
+      </button>
+    );
+  };
+
+  const TeacherClassesTable = ({ teacher, rows }) => {
+    const tone = teacherTone(teacher);
+    const regularRowCount = rows.filter(r => !r.isSpecial).length;
+    const totals = rows.reduce((acc, r) => ({
+      expected:  acc.expected  + r.expected,
+      actual:    acc.actual    + r.actual,
+      makeups:   acc.makeups   + r.makeups,
+      trials:    acc.trials    + r.trials,
+      workshops: acc.workshops + (r.workshops || 0),
+      total:     acc.total     + r.total,
+    }), { expected: 0, actual: 0, makeups: 0, trials: 0, workshops: 0, total: 0 });
+
+    return (
+      <div className="card overflow-hidden">
+        <div className={`px-5 py-3 flex items-center justify-between gap-3 border-l-4 ${tone.border} flex-wrap`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-full ${tone.bg} flex items-center justify-center text-white font-bold text-xs`}>{teacher.slice(0,2)}</div>
+            <div>
+              <h3 className="font-semibold text-navy">{teacher}</h3>
+              <div className="text-xs text-navy-400">{regularRowCount} class{regularRowCount === 1 ? '' : 'es'} this week</div>
+            </div>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <div className="text-2xl font-bold text-navy tabular-nums">{totals.total}</div>
+            <div className="text-[10px] uppercase text-navy-400 font-semibold tracking-wider">total students taught</div>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-navy-50/40">
+              <tr className="text-xs uppercase text-navy-400">
+                <th className="text-left px-5 py-2 font-medium">Class / Session</th>
+                <th className="text-left px-5 py-2 font-medium">Slot</th>
+                <th className="text-right px-5 py-2 font-medium">Expected</th>
+                <th className="text-right px-5 py-2 font-medium">Actual</th>
+                <th className="text-right px-5 py-2 font-medium">Makeups</th>
+                <th className="text-right px-5 py-2 font-medium">Trials</th>
+                <th className="text-right px-5 py-2 font-medium">Workshop</th>
+                <th className="text-right px-5 py-2 font-medium">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => {
+                const cls = CLASSES.find(c => c.id === r.classId);
+                const ratio = r.expected > 0 ? Math.min(1, r.actual / r.expected) : 0;
+                return (
+                  <tr key={`${r.classId}-${idx}`} className="border-t border-navy-50 hover:bg-navy-50/40 transition">
+                    <td className="px-5 py-3">
+                      {r.isSpecial
+                        ? <span className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-[10px]">{r.className}</span>
+                        : <span className="font-mono text-navy">{r.classId}</span>}
+                    </td>
+                    <td className="px-5 py-3 text-navy-500">{r.isSpecial ? '—' : (cls?.slot ?? '')}</td>
+                    <td className="px-5 py-3 text-right text-navy-500">{r.isSpecial ? '—' : r.expected}</td>
+                    <td className="px-5 py-3 text-right">
+                      {r.isSpecial ? <span className="text-navy-300">—</span> : (
+                        <div className="flex items-center justify-end gap-2">
+                          <div className="w-14 h-1.5 rounded-full bg-navy-50 overflow-hidden">
+                            <div className={`h-full ${tone.bg}`} style={{ width: `${ratio * 100}%` }} />
+                          </div>
+                          <span className="tabular-nums">{r.actual}</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums">{r.makeups || ''}</td>
+                    <td className="px-5 py-3 text-right tabular-nums">{r.trials || ''}</td>
+                    <td className="px-5 py-3 text-right tabular-nums">{r.workshops || ''}</td>
+                    <td className="px-5 py-3 text-right font-semibold tabular-nums">{r.total}</td>
+                  </tr>
+                );
+              })}
+              <tr className="border-t-2 border-navy-100 bg-navy-50/30 font-semibold">
+                <td className="px-5 py-2.5 text-navy text-xs uppercase tracking-wider">Subtotal</td>
+                <td />
+                <td className="px-5 py-2.5 text-right tabular-nums">{totals.expected}</td>
+                <td className="px-5 py-2.5 text-right tabular-nums">{totals.actual}</td>
+                <td className="px-5 py-2.5 text-right tabular-nums">{totals.makeups}</td>
+                <td className="px-5 py-2.5 text-right tabular-nums">{totals.trials}</td>
+                <td className="px-5 py-2.5 text-right tabular-nums">{totals.workshops}</td>
+                <td className={`px-5 py-2.5 text-right tabular-nums ${tone.text}`}>{totals.total}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  const Stat = ({ label, value, highlight }) => (
+    <div className="text-right">
+      <div className="text-[10px] uppercase tracking-wider text-white/60 font-semibold">{label}</div>
+      <div className={`tabular-nums ${highlight ? 'text-3xl font-bold text-sun' : 'text-xl font-semibold text-white'}`}>{value}</div>
+    </div>
+  );
+
+  const Headcount = ({ headcountRows, onToast }) => {
+    const [focusTeacher, setFocusTeacher] = React.useState(null);
+
+    const byTeacher = {};
+    for (const r of headcountRows) {
+      const teacher = r.teacher
+        || CLASSES.find(c => c.id === r.classId)?.teacher
+        || 'UNASSIGNED';
+      (byTeacher[teacher] = byTeacher[teacher] || []).push(r);
+    }
+    const teachers = Object.keys(byTeacher).sort();
+
+    const grand = headcountRows.reduce((acc, r) => ({
+      expected:  acc.expected  + r.expected,
+      actual:    acc.actual    + r.actual,
+      makeups:   acc.makeups   + r.makeups,
+      trials:    acc.trials    + r.trials,
+      workshops: acc.workshops + (r.workshops || 0),
+      total:     acc.total     + r.total,
+    }), { expected: 0, actual: 0, makeups: 0, trials: 0, workshops: 0, total: 0 });
+
+    function handleExport(from, to) {
+      const rows = [
+        ['Week start','Week end','Teacher','Class / Session','Name','Expected','Actual','Makeups','Trials','Workshop','Total (bonus base)'],
+        ...teachers.flatMap(t =>
+          byTeacher[t].map(r => [from, to, t, r.classId, r.className, r.expected, r.actual, r.makeups, r.trials, r.workshops || 0, r.total])
+        ),
+        [],
+        ['','','TEACHER SUBTOTALS'],
+        ...teachers.map(t => {
+          const sub = byTeacher[t].reduce((acc, r) => ({
+            expected: acc.expected + r.expected, actual: acc.actual + r.actual,
+            makeups: acc.makeups + r.makeups, trials: acc.trials + r.trials,
+            workshops: acc.workshops + (r.workshops || 0), total: acc.total + r.total,
+          }), { expected: 0, actual: 0, makeups: 0, trials: 0, workshops: 0, total: 0 });
+          const classRowCount = byTeacher[t].filter(r => !r.isSpecial).length;
+          return ['', '', t, classRowCount + ' classes', '', sub.expected, sub.actual, sub.makeups, sub.trials, sub.workshops, sub.total];
+        }),
+      ];
+      downloadCsv(`headcount-by-teacher_${from}_to_${to}.csv`, rows);
+      onToast?.(`Exported headcounts by teacher (${from} → ${to})`);
+    }
+
+    const visibleTeachers = focusTeacher ? [focusTeacher] : teachers;
+
+    return (
+      <div className="space-y-6">
+        <SectionHeader
+          eyebrow="Reporting · Bonus"
+          title="Weekly Headcounts by Teacher"
+          description="Each teacher's weekly bonus is based on the total students they actually taught (Present + Makeup + Trial + Workshop). Only attendance counts — approved-but-not-attended makeups are excluded. Click a card to focus."
+          action={
+            <div className="chip bg-navy-50 text-navy-600 border border-navy-100 !text-xs">
+              Week of {HEADCOUNT_WEEK.start} → {HEADCOUNT_WEEK.end}
+            </div>
+          }
+        />
+
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-xs text-navy-400">
+            Showing week <strong className="text-navy">{HEADCOUNT_WEEK.start} → {HEADCOUNT_WEEK.end}</strong>
+            {focusTeacher && <> · focused on <strong className="text-navy">{focusTeacher}</strong> <button onClick={() => setFocusTeacher(null)} className="text-sky hover:underline ml-1">clear</button></>}
+          </div>
+          <ExportRange label="headcounts by teacher" defaultFrom="2026-04-01" defaultTo="2026-05-15" onExport={handleExport} />
+        </div>
+
+        <div className={`grid gap-4 grid-cols-1 sm:grid-cols-2 ${teachers.length <= 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+          {teachers.map(t => (
+            <TeacherSummaryCard
+              key={t}
+              teacher={t}
+              rows={byTeacher[t]}
+              isActive={focusTeacher === t}
+              onClick={() => setFocusTeacher(focusTeacher === t ? null : t)}
+            />
+          ))}
+        </div>
+
+        <div className="grid gap-4">
+          {visibleTeachers.map(t => <TeacherClassesTable key={t} teacher={t} rows={byTeacher[t]} />)}
+        </div>
+
+        {!focusTeacher && (
+          <div className="card p-5 bg-navy text-white">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-white/70 font-semibold">All teachers · week total</div>
+                <div className="text-sm text-white/60">{teachers.length} teacher{teachers.length === 1 ? '' : 's'} · {headcountRows.filter(r => !r.isSpecial).length} classes</div>
+              </div>
+              <div className="flex items-center gap-6 flex-wrap">
+                <Stat label="Expected" value={grand.expected} />
+                <Stat label="Actual"   value={grand.actual} />
+                <Stat label="Makeups"  value={grand.makeups} />
+                <Stat label="Trials"   value={grand.trials} />
+                <Stat label="Workshop" value={grand.workshops} />
+                <Stat label="Total in seats" value={grand.total} highlight />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ============================================================
+  // ROSTER — admin: add/remove/move students, add/remove classes
+  // ============================================================
+  const AddStudentForm = ({ onAdd, onToast }) => {
+    const [nick, setNick]       = React.useState('');
+    const [full, setFull]       = React.useState('');
+    const [classId, setClassId] = React.useState('');
+    const [err, setErr]         = React.useState('');
+
+    function submit(e) {
+      e.preventDefault();
+      if (!nick.trim() || !classId) { setErr('Nickname and class are required.'); return; }
+      if ((STUDENTS_BY_CLASS[classId] ?? []).map(s => s.toLowerCase()).includes(nick.trim().toLowerCase())) {
+        setErr(`"${nick}" is already in ${classId}.`); return;
+      }
+      onAdd({ nickname: nick.trim(), fullName: full.trim(), classId });
+      onToast?.(`Added ${nick.trim()} to ${classId}.`);
+      setNick(''); setFull(''); setErr('');
+    }
+
+    return (
+      <form onSubmit={submit} className="card p-5 grid gap-4">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-leaf">Add a student</div>
+          <p className="text-xs text-navy-400 mt-0.5">New student joining a class? Log them here.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="label">Nickname *</label>
+            <input className="input" placeholder="e.g. Mango" value={nick} onChange={(e)=>setNick(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Full name</label>
+            <input className="input" placeholder="e.g. Manat Apinyaprom" value={full} onChange={(e)=>setFull(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Class *</label>
+            <select className="input" value={classId} onChange={(e)=>setClassId(e.target.value)}>
+              <option value="">Select class…</option>
+              {CLASSES.map((c) => (
+                <option key={c.id} value={c.id}>{c.id} · {c.slot} · {c.teacher}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {err && <div className="text-sm text-red-600 bg-red-50 rounded-md p-3 border border-red-100">{err}</div>}
+        <div className="flex justify-end">
+          <button type="submit" className="btn-primary">+ Add student</button>
+        </div>
+      </form>
+    );
+  };
+
+  const DAYS  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  const AddClassForm = ({ onAdd, onToast }) => {
+    const [id, setId]           = React.useState('');
+    const [year, setYear]       = React.useState('Year 1');
+    const [day, setDay]         = React.useState('Tue');
+    const [time, setTime]       = React.useState('15:30');
+    const [teacher, setTeacher] = React.useState('BEA');
+    const [err, setErr]         = React.useState('');
+
+    function submit(e) {
+      e.preventDefault();
+      if (!id.trim()) { setErr('Class ID is required (e.g. 1-BT10).'); return; }
+      if (CLASSES.some(c => c.id.toLowerCase() === id.trim().toLowerCase())) {
+        setErr(`Class "${id}" already exists.`); return;
+      }
+      onAdd({
+        id: id.trim(),
+        name: `${year} · ${day} ${time}`,
+        teacher, slot: `${day} ${time}`,
+        day, time,
+      });
+      onToast?.(`Created class ${id.trim()}.`);
+      setId(''); setErr('');
+    }
+
+    return (
+      <form onSubmit={submit} className="card p-5 grid gap-4">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-leaf">Add a class</div>
+          <p className="text-xs text-navy-400 mt-0.5">Open a new timeslot. Use the standard ID format <code className="text-navy-600">Year-BT#</code> (e.g. 1-BT10).</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div>
+            <label className="label">Class ID *</label>
+            <input className="input" placeholder="1-BT10" value={id} onChange={(e)=>setId(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Year</label>
+            <select className="input" value={year} onChange={(e)=>setYear(e.target.value)}>
+              <option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">Day</label>
+            <select className="input" value={day} onChange={(e)=>setDay(e.target.value)}>
+              {DAYS.map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="label">Time</label>
+            <input type="time" className="input" value={time} onChange={(e)=>setTime(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Teacher</label>
+            <select className="input" value={teacher} onChange={(e)=>setTeacher(e.target.value)}>
+              {TEACHERS.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+        </div>
+        {err && <div className="text-sm text-red-600 bg-red-50 rounded-md p-3 border border-red-100">{err}</div>}
+        <div className="flex justify-end">
+          <button type="submit" className="btn-primary">+ Add class</button>
+        </div>
+      </form>
+    );
+  };
+
+  const ClassRosterList = ({ onRemoveStudent, onMoveStudent, onRemoveClass }) => {
+    const [open, setOpen] = React.useState(() => new Set());
+    function toggle(id) {
+      setOpen(s => { const next = new Set(s); next.has(id) ? next.delete(id) : next.add(id); return next; });
+    }
+
+    return (
+      <div className="card overflow-hidden">
+        <div className="px-5 py-3 border-b border-navy-50 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-navy">All classes & students</h2>
+            <p className="text-xs text-navy-400">{CLASSES.length} classes · {Object.values(STUDENTS_BY_CLASS).reduce((a, b) => a + b.length, 0)} students</p>
+          </div>
+        </div>
+        <ul className="divide-y divide-navy-50">
+          {CLASSES.map((c) => {
+            const roster = STUDENTS_BY_CLASS[c.id] ?? [];
+            const isOpen = open.has(c.id);
+            return (
+              <li key={c.id}>
+                <button onClick={() => toggle(c.id)}
+                  className="w-full px-5 py-3 flex items-center justify-between gap-4 hover:bg-navy-50/40 transition text-left">
+                  <div className="flex items-center gap-3">
+                    <span className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <div>
+                      <div className="font-mono font-semibold text-navy">{c.id}</div>
+                      <div className="text-xs text-navy-400">{c.slot} · {c.teacher}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="chip bg-navy-50 text-navy-600 border border-navy-100">{roster.length} student{roster.length === 1 ? '' : 's'}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); if (confirm(`Remove class ${c.id}? Its ${roster.length} student(s) will become unassigned.`)) onRemoveClass(c.id); }}
+                      className="text-navy-300 hover:text-red-500 transition text-xs"
+                      aria-label="Remove class"
+                    >Remove</button>
+                  </div>
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-4 pt-1 bg-navy-50/30">
+                    {roster.length === 0 ? (
+                      <div className="text-sm text-navy-400 py-2">No students yet — add one above.</div>
+                    ) : (
+                      <ul className="grid gap-1.5">
+                        {roster.map(nick => (
+                          <li key={nick} className="flex items-center justify-between px-3 py-2 bg-white rounded-md border border-navy-50 gap-2 flex-wrap">
+                            <div>
+                              <div className="font-medium text-navy text-sm">{nick}</div>
+                              {FULL_NAME_BY_NICK[nick] && <div className="text-xs text-navy-300">{FULL_NAME_BY_NICK[nick]}</div>}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <select
+                                value={c.id}
+                                onChange={(e) => onMoveStudent(nick, c.id, e.target.value)}
+                                className="text-xs px-2 py-1 rounded-md border border-navy-100 bg-white text-navy-600"
+                                title="Move to another class"
+                              >
+                                {CLASSES.map(x => <option key={x.id} value={x.id}>{x.id}</option>)}
+                              </select>
+                              <button
+                                onClick={() => onRemoveStudent(c.id, nick)}
+                                className="text-navy-300 hover:text-red-500 transition w-7 h-7 rounded-md hover:bg-red-50 flex items-center justify-center"
+                                aria-label={`Remove ${nick}`}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
+
+  const Roster = ({ onAddStudent, onAddClass, onRemoveStudent, onMoveStudent, onRemoveClass, onToast }) => (
+    <div className="space-y-6">
+      <SectionHeader
+        eyebrow="Admin"
+        title="Roster & Classes"
+        description="Add new students joining a class, or open up a new class timeslot. Mirrors the Students and Classes tabs in the Sheet."
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <AddStudentForm onAdd={onAddStudent} onToast={onToast} />
+        <AddClassForm   onAdd={onAddClass}   onToast={onToast} />
+      </div>
+
+      <ClassRosterList
+        onRemoveStudent={onRemoveStudent}
+        onMoveStudent={onMoveStudent}
+        onRemoveClass={onRemoveClass}
+      />
+    </div>
+  );
+
+  // ============================================================
+  // APP SHELL — state + routing + modal + persistence
+  // ============================================================
+  const App = () => {
+    // Hydrate from localStorage if present, else use seed data.
+    const initial = storage.load();
+    const [route, setRoute]             = React.useState('dashboard');
+    const [filter, setFilter]           = React.useState('all');
+    const [requests, setRequests]       = React.useState(() => initial?.requests   ?? SEED_REQUESTS);
+    const [attendance, setAttendance]   = React.useState(() => initial?.attendance ?? SEED_RECENT_ATTENDANCE);
+    const [tracker, setTracker]         = React.useState(() => initial?.tracker    ?? SEED_WEEK_TRACKER);
+    const [modalOpen, setModalOpen]     = React.useState(false);
+    const [editingRequest, setEditingRequest] = React.useState(null);
+    const [toast, setToast]             = React.useState(null);
+    const [, bump] = React.useReducer(x => x + 1, 0);
+
+    // Persist on every meaningful change.
+    React.useEffect(() => {
+      storage.save({ requests, attendance, tracker });
+    }, [requests, attendance, tracker]);
+
+    // Hide the splash once React has rendered.
+    React.useEffect(() => {
+      const s = document.getElementById('splash');
+      if (s) { s.classList.add('hidden'); setTimeout(() => s.remove(), 300); }
+    }, []);
+
+    function addStudent({ nickname, fullName, classId }) {
+      if (!STUDENTS_BY_CLASS[classId]) STUDENTS_BY_CLASS[classId] = [];
+      STUDENTS_BY_CLASS[classId].push(nickname);
+      if (fullName) FULL_NAME_BY_NICK[nickname] = fullName;
+      bump();
+      callBackend('addStudent', { nickname, fullName, classId });
+    }
+    function removeStudent(classId, nickname) {
+      if (STUDENTS_BY_CLASS[classId]) {
+        STUDENTS_BY_CLASS[classId] = STUDENTS_BY_CLASS[classId].filter(s => s !== nickname);
+      }
+      bump();
+      showToast(`Removed ${nickname} from ${classId}.`);
+      callBackend('removeStudent', { classId, nickname });
+    }
+    function moveStudent(nickname, fromClass, toClass) {
+      if (fromClass === toClass) return;
+      if (STUDENTS_BY_CLASS[fromClass]) {
+        STUDENTS_BY_CLASS[fromClass] = STUDENTS_BY_CLASS[fromClass].filter(s => s !== nickname);
+      }
+      if (!STUDENTS_BY_CLASS[toClass]) STUDENTS_BY_CLASS[toClass] = [];
+      if (!STUDENTS_BY_CLASS[toClass].includes(nickname)) STUDENTS_BY_CLASS[toClass].push(nickname);
+      bump();
+      showToast(`Moved ${nickname}: ${fromClass} → ${toClass}.`);
+      callBackend('moveStudent', { nickname, fromClass, toClass });
+    }
+    function addClass(cls) {
+      CLASSES.push(cls);
+      CLASSES.sort((a, b) => a.id.localeCompare(b.id));
+      STUDENTS_BY_CLASS[cls.id] = STUDENTS_BY_CLASS[cls.id] ?? [];
+      bump();
+      callBackend('addClass', cls);
+    }
+    function removeClass(classId) {
+      const idx = CLASSES.findIndex(c => c.id === classId);
+      if (idx >= 0) CLASSES.splice(idx, 1);
+      delete STUDENTS_BY_CLASS[classId];
+      bump();
+      showToast(`Removed class ${classId}.`);
+      callBackend('removeClass', { classId });
+    }
+
+    const toastTimer = React.useRef(null);
+    function showToast(msg) {
+      setToast(msg);
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setToast(null), 2800);
+    }
+
+    function navigate(r, f = null) {
+      setRoute(r);
+      if (f) setFilter(f); else if (r !== 'makeup') setFilter('all');
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0 });
+    }
+
+    function updateRequest(id, patch) {
+      setRequests(rs => rs.map(r => r.id === id ? { ...r, ...patch } : r));
+      if (patch.teacherConfirmed)          showToast('Teacher confirmed.');
+      else if (patch.adminApproved)        showToast('Admin manager approved — add to Google Calendar next.');
+      else if (patch.calendarEventCreated) showToast('Marked as scheduled. All done!');
+      callBackend('updateMakeup', { id, updates: patch });
+    }
+
+    function addRequest(form) {
+      const nextNum = requests.reduce((m, r) => Math.max(m, parseInt(r.id.replace(/\D/g, ''), 10) || 0), 0) + 1;
+      const newReq = {
+        id: 'MR-' + String(nextNum).padStart(4, '0'),
+        ...form,
+        teacherConfirmed: false,
+        adminApproved: false,
+        calendarEventCreated: false,
+      };
+      setRequests(rs => [newReq, ...rs]);
+      setModalOpen(false);
+      showToast(`Request ${newReq.id} created — pending ${newReq.teacher}'s confirmation.`);
+      navigate('makeup', 'pending-teacher');
+      callBackend('createMakeup', newReq);
+    }
+
+    function editRequest(form) {
+      if (!editingRequest) return;
+      const id = editingRequest.id;
+      setRequests(rs => rs.map(r => r.id === id ? { ...r, ...form } : r));
+      setModalOpen(false);
+      setEditingRequest(null);
+      showToast(`Request ${id} updated.`);
+      callBackend('updateMakeup', { id, updates: form });
+    }
+
+    function openEditRequest(req) {
+      setEditingRequest(req);
+      setModalOpen(true);
+    }
+
+    function removeRequest(req) {
+      if (!window.confirm(`Delete makeup request ${req.id} for ${req.studentNickname}? This cannot be undone.`)) return;
+      setRequests(rs => rs.filter(r => r.id !== req.id));
+      showToast(`Request ${req.id} deleted.`);
+      callBackend('removeMakeup', { id: req.id });
+    }
+
+    function closeModal() {
+      setModalOpen(false);
+      setEditingRequest(null);
+    }
+
+    function recomputeTrackerForClass(classId, attendanceList) {
+      setTracker(t => t.map(c => {
+        if (c.classId !== classId) return c;
+        const rowsForClass = attendanceList.filter(r => r.classId === classId);
+        if (rowsForClass.length === 0) {
+          return { ...c, present: 0, preNotified: 0, noNotice: 0, status: 'pending' };
+        }
+        const counts = rowsForClass.reduce((acc, r) => {
+          if (r.status === 'Present')                    acc.present++;
+          else if (r.status === 'Absent (pre-notified)') acc.preNotified++;
+          else if (r.status === 'Absent (no notice)')    acc.noNotice++;
+          return acc;
+        }, { present: 0, preNotified: 0, noNotice: 0 });
+        return { ...c, ...counts, status: 'logged' };
+      }));
+    }
+
+    function updateAttendance(id, patch) {
+      const target = attendance.find(r => r.id === id);
+      if (!target) return;
+      const updated = attendance.map(r => r.id === id ? { ...r, ...patch } : r);
+      setAttendance(updated);
+      recomputeTrackerForClass(target.classId, updated);
+      showToast(`Updated ${target.studentNickname} (${target.classId}).`);
+      callBackend('updateAttendance', { id, updates: patch });
+    }
+
+    function removeAttendance(row) {
+      if (!window.confirm(`Delete attendance entry for ${row.studentNickname} on ${row.date} (${row.classId})?`)) return;
+      const updated = attendance.filter(r => r.id !== row.id);
+      setAttendance(updated);
+      recomputeTrackerForClass(row.classId, updated);
+      showToast(`Deleted attendance for ${row.studentNickname}.`);
+      callBackend('removeAttendance', { id: row.id });
+    }
+
+    function logSession(rows) {
+      if (!rows || rows.length === 0) return;
+      setAttendance(a => [...rows, ...a]);
+      // Tracker only tracks regular classes; only update if the first row is a real classId.
+      const classId = rows[0].classId;
+      if (!isSpecialClassId(classId)) {
+        setTracker(t => t.map(c => {
+          if (c.classId !== classId) return c;
+          const counts = rows.reduce((acc, r) => {
+            if (r.status === 'Present')                    acc.present++;
+            else if (r.status === 'Absent (pre-notified)') acc.preNotified++;
+            else if (r.status === 'Absent (no notice)')    acc.noNotice++;
+            return acc;
+          }, { present: 0, preNotified: 0, noNotice: 0 });
+          return { ...c, ...counts, status: 'logged' };
+        }));
+      }
+      callBackend('createAttendance', { rows });
+    }
+
+    // Headcount = derived entirely from attendance log (not approval status).
+    //   • Expected = current roster size for the class
+    //   • Actual   = students marked Present in this week's attendance for the class
+    //   • Makeups  = "Makeup attendee" rows attributed to that teacher in this week (regular-class slot)
+    //   • Trials   = "Trial" rows in this week (regular-class slot)
+    //   • Workshop = "Workshop attendee" rows in this week (workshop slot)
+    //   • Extra teacher-level rows for off-schedule makeups and workshops
+    const headcountRows = React.useMemo(() => {
+      const inWeek = (d) => d >= HEADCOUNT_WEEK.start && d <= HEADCOUNT_WEEK.end;
+
+      // Aggregate weekly attendance per (classId, teacher) bucket.
+      const buckets = {}; // key = `${classId}|${teacher}` → { present, makeups, trials, workshops }
+      for (const a of attendance) {
+        if (!inWeek(a.date)) continue;
+        const teacher = a.teacher
+          || (CLASSES.find(c => c.id === a.classId)?.teacher)
+          || 'UNASSIGNED';
+        const key = `${a.classId}|${teacher}`;
+        if (!buckets[key]) buckets[key] = { classId: a.classId, teacher, present: 0, makeups: 0, trials: 0, workshops: 0 };
+        if      (a.status === 'Present')           buckets[key].present++;
+        else if (a.status === 'Makeup attendee')   buckets[key].makeups++;
+        else if (a.status === 'Trial')             buckets[key].trials++;
+        else if (a.status === 'Workshop attendee') buckets[key].workshops++;
+      }
+
+      const rows = [];
+
+      // One row per regular class.
+      for (const cls of CLASSES) {
+        const key = `${cls.id}|${cls.teacher}`;
+        const b = buckets[key] ?? { present: 0, makeups: 0, trials: 0, workshops: 0 };
+        const expected = (STUDENTS_BY_CLASS[cls.id] ?? []).length;
+        rows.push({
+          classId: cls.id,
+          className: cls.name,
+          teacher: cls.teacher,
+          expected,
+          actual:   b.present,
+          makeups:  b.makeups,
+          trials:   b.trials,
+          workshops: 0, // workshops never happen during a regular slot
+          total: b.present + b.makeups + b.trials,
+          isSpecial: false,
+        });
+      }
+
+      // Extra row per teacher for off-schedule makeups (if any in week).
+      const offByTeacher = {};
+      const workshopByTeacher = {};
+      for (const key in buckets) {
+        const b = buckets[key];
+        if (b.classId === OFF_SCHEDULE_ID && b.makeups > 0) {
+          offByTeacher[b.teacher] = (offByTeacher[b.teacher] ?? 0) + b.makeups;
+        }
+        if (b.classId === WORKSHOP_ID && b.workshops > 0) {
+          workshopByTeacher[b.teacher] = (workshopByTeacher[b.teacher] ?? 0) + b.workshops;
+        }
+      }
+      for (const teacher of Object.keys(offByTeacher).sort()) {
+        const n = offByTeacher[teacher];
+        rows.push({
+          classId: OFF_SCHEDULE_ID,
+          className: 'Off-schedule makeups',
+          teacher, expected: 0, actual: 0,
+          makeups: n, trials: 0, workshops: 0,
+          total: n,
+          isSpecial: true,
+        });
+      }
+      for (const teacher of Object.keys(workshopByTeacher).sort()) {
+        const n = workshopByTeacher[teacher];
+        rows.push({
+          classId: WORKSHOP_ID,
+          className: 'Workshops',
+          teacher, expected: 0, actual: 0,
+          makeups: 0, trials: 0, workshops: n,
+          total: n,
+          isSpecial: true,
+        });
+      }
+
+      return rows;
+    }, [attendance]);
+
+    let screen;
+    if (route === 'dashboard') {
+      screen = <Dashboard requests={requests} attendance={attendance} onNavigate={navigate} onNewRequest={() => { setEditingRequest(null); setModalOpen(true); }} />;
+    } else if (route === 'makeup') {
+      screen = <MakeupList requests={requests} initialFilter={filter} onUpdateRequest={updateRequest} onEditRequest={openEditRequest} onDeleteRequest={removeRequest} onNewRequest={() => { setEditingRequest(null); setModalOpen(true); }} onToast={showToast} />;
+    } else if (route === 'attendance') {
+      screen = <Attendance tracker={tracker} recent={attendance} onLogSession={logSession} onUpdateAttendance={updateAttendance} onDeleteAttendance={removeAttendance} onToast={showToast} />;
+    } else if (route === 'headcount') {
+      screen = <Headcount headcountRows={headcountRows} onToast={showToast} />;
+    } else if (route === 'roster') {
+      screen = <Roster
+        onAddStudent={addStudent}
+        onAddClass={addClass}
+        onRemoveStudent={removeStudent}
+        onMoveStudent={moveStudent}
+        onRemoveClass={removeClass}
+        onToast={showToast}
+      />;
+    }
+
+    return (
+      <Frame>
+        <Nav active={route} onNavigate={navigate} onNewRequest={() => { setEditingRequest(null); setModalOpen(true); }} />
+        <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">{screen}</main>
+        <footer className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 text-center text-xs text-navy-300">
+          Math Mavens Thailand · Internal portal · The Sheet remains the source of truth.
+        </footer>
+
+        {modalOpen && <MakeupModal initial={editingRequest} onSubmit={editingRequest ? editRequest : addRequest} onClose={closeModal} />}
+        <Toast toast={toast} />
+      </Frame>
+    );
+  };
+
+  // Mount.
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
+</script>
+
+<!-- ============================================================
+     DEV / OPS NOTES
+     ============================================================
+     • This file is fully self-contained. To deploy to Vercel:
+         1. Drag-and-drop this single .html file into a new Vercel
+            project (or commit to a repo, set "Other" framework,
+            and point the build to no command).
+         2. Done. The CDN-hosted Tailwind/React/Babel scripts make
+            this a pure static site — no build step required.
+     • To wire to the live Google Sheet:
+         1. In the bound Apps Script project, paste in
+            apps-script/MMT_WebApp.gs and set Script Property
+            SHARED_SECRET.
+         2. Deploy as Web App (Execute as: Me, Access: Anyone).
+         3. Copy the /exec URL into MMT_CONFIG.APPS_SCRIPT_URL
+            above, set APPS_SCRIPT_SECRET to the same secret,
+            and flip BACKEND_ENABLED to true.
+     • All state lives in localStorage under the key
+       MMT_CONFIG.STORAGE_KEY. To reset to seed data, clear
+       localStorage in the browser devtools (Application tab).
+     ============================================================ -->
+</body>
+</html>
+
